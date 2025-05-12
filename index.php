@@ -34,27 +34,9 @@
       </div>
       <!-- Tweet 1 -->
       <article class="tweet" aria-label="Tweet by JUST MIH™">
-        <img
-          src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
-          alt="Profile picture of a user with a dog"
-          class="profile-pic"
-          width="48"
-          height="48"
-          loading="lazy"
-        />
+       
         <div class="content">
-          <header>
-            <span class="name">JUST MIH™</span>
-            <span class="time">@HUMUORn · 2h</span>
-            <button class="more-btn" aria-label="More options"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></button>
-          </header>
-          <p class="text">
-            Me: Bro ni nani ameimba hii wimbo?
-            <br />
-            Him: Juice wrld.
-            <br />
-            Me: Si uache aimbe.
-          </p>
+        
           <img
             src="https://storage.googleapis.com/a1aa/image/73214d66-2621-4b7b-7019-508c964121a5.jpg"
             alt="View from inside a car showing a dog sitting in the passenger seat looking back"
@@ -63,12 +45,39 @@
             height="300"
             loading="lazy"
           />
+           <img
+          src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
+          alt="Profile picture of a user with a dog"
+          class="profile-pic"
+          width="48"
+          height="48"
+          loading="lazy"
+        />
+        <header>
+            <span class="name">NEXUS™</span>
+            <span class="time">@nexus · 2h</span>
+            <button class="more-btn" aria-label="More options"> <div><i class="far fa-bookmark" aria-hidden="true"></i></div></i></button>
+          </header>
+          <p class="text">
+            Me: Bro ni nani ameimba hii wimbo?Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo?   Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+               Me: Bro ni nani ameimba hii wimbo?Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo?   Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+            Me: Bro ni nani ameimba hii wimbo? Me: Bro ni nani ameimba hii wimbo?
+            <br />
+            Him: Juice wrld.
+            <br />
+            Me: Si uache aimbe.
+          </p>
           <footer>
-            <div><i class="far fa-comment" aria-hidden="true"></i> 57</div>
-            <div><i class="fas fa-retweet" aria-hidden="true"></i> 235</div>
+            <div><i class="far fa-comment" aria-hidden="true"></i> 57</div>        
             <div><i class="far fa-heart" aria-hidden="true"></i> 776</div>
-            <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 9.2K</div>
-            <div><i class="far fa-bookmark" aria-hidden="true"></i></div>
+            <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 9.2K</div>           
             <div><i class="fas fa-upload" aria-hidden="true"></i></div>
           </footer>
         </div>
@@ -81,38 +90,7 @@
         <input type="search" placeholder="Search" aria-label="Search" />
         <button aria-label="Search button"><i class="fas fa-search" aria-hidden="true"></i></button>
       </div>
-      <div class="hosting-list" aria-label="Hosting channels">
-        <div class="hosting-item">
-          <div class="hosting-left">
-            <img src="https://storage.googleapis.com/a1aa/image/230a2c4d-9dbe-40af-93f3-4aea0e10780b.jpg" alt="NTV Kenya logo" width="32" height="32" loading="lazy" />
-            <div>
-              <p class="hosting-text">NTV Kenya</p>
-              <p class="hosting-subtext">is hosting</p>
-            </div>
-          </div>
-          <span class="hosting-right">+3.5K</span>
-        </div>
-        <div class="hosting-item">
-          <div class="hosting-left">
-            <img src="https://storage.googleapis.com/a1aa/image/41703d74-c983-466e-e3cd-5102407d779c.jpg" alt="Citizen TV Kenya logo" width="32" height="32" loading="lazy" />
-            <div>
-              <p class="hosting-text">Citizen TV Live</p>
-              <p class="hosting-subtext">is hosting</p>
-            </div>
-          </div>
-          <span class="hosting-right">+1.3K</span>
-        </div>
-        <div class="hosting-item">
-          <div class="hosting-left">
-            <img src="https://storage.googleapis.com/a1aa/image/5d8e7075-0f41-4422-6332-863825e25754.jpg" alt="KTN News logo" width="32" height="32" loading="lazy" />
-            <div>
-              <p class="hosting-text">KTN NEWS</p>
-              <p class="hosting-subtext">is hosting</p>
-            </div>
-          </div>
-          <span class="hosting-right">+15</span>
-        </div>
-      </div>
+      
       <section class="card" aria-label="What's happening">
         <h2>Suggested For You</h2>
         <article class="wh-item">
@@ -124,65 +102,61 @@
         </article>
         <div class="trending-list">
           <div>
-            <p>Trending in Kenya</p>
-            <p class="trend-title">George Natembeya</p>
-            <p>3,166 posts</p>
+            <p>Based on your Recent activity</p>
+            <p class="trend-title">KCSC Results released</p>
+            <p>Top candidate scores A plain of 84 points</p>
             <button class="more-btn" aria-label="More options for George Natembeya">...</button>
           </div>
           <div>
-            <p>Trending in Kenya</p>
-            <p class="trend-title">Farouk Kibet</p>
-            <p>4,293 posts</p>
+            <p>You Liked a similar post</p>
+            <p class="trend-title">Mike Mueni to run for Precidency</p>
+            <p>Mike Mueni Registers his Revolution Party and Confirms</p>
             <button class="more-btn" aria-label="More options for Farouk Kibet">...</button>
           </div>
           <div>
-            <p>Trending in Kenya</p>
-            <p class="trend-title">#BanForeignHate</p>
-            <p>1,131 posts</p>
+            <p>You commented on a similar post</p>
+            <p class="trend-title">Man United thraches Leeds United</p>
+            <p>Home derby win for the reds as they eye premier league title</p>
             <button class="more-btn" aria-label="More options for #BanForeignHate">...</button>
           </div>
-          <div>
-            <p>Trending in Kenya</p>
-            <p class="trend-title">HON HASSAN DUALE</p>
-            <button class="more-btn" aria-label="More options for HON HASSAN DUALE">...</button>
-          </div>
+          
           <button class="more-btn" aria-label="Show more trending topics">Show more</button>
         </div>
       </section>
       <section class="card" aria-label="Who to follow">
-        <h2>Who to follow</h2>
+        <h2>Subscribe to these News Outlets</h2>
         <div class="follow-list">
           <article>
             <div class="follow-left">
-              <img src="https://storage.googleapis.com/a1aa/image/02cc31a3-e529-437b-3145-3e30bc8878cf.jpg" alt="TEL profile picture" width="32" height="32" loading="lazy" />
+              <img src="" alt="Tprofile" width="32" height="32" loading="lazy" />
               <div class="user-info">
-                <p>TEL</p>
-                <p class="handle">@_Tel254</p>
+                <p>NASA</p>
+                <p class="handle">@nasa</p>
               </div>
             </div>
-            <button class="follow-btn" type="button">Follow</button>
+            <button class="follow-btn" type="button">Subscribe</button>
           </article>
           <article>
             <div class="follow-left">
-              <img src="https://storage.googleapis.com/a1aa/image/19bf423e-8a8b-4caa-3afe-8be181bab7c2.jpg" alt="Rod Sam Molder profile picture" width="32" height="32" loading="lazy" />
+              <img src="" alt="profile" width="32" height="32" loading="lazy" />
               <div class="user-info">
-                <p>Rod Sam Molder</p>
-                <p class="handle">@GuiverMiguel</p>
+                <p>NEXUS</p>
+                <p class="handle">@nexus</p>
               </div>
-              <i class="fas fa-check-circle verified" aria-label="Verified account"></i>
+           
             </div>
-            <button class="follow-btn" type="button">Follow</button>
+            <button class="follow-btn" type="button">Subscribe</button>
           </article>
           <article>
             <div class="follow-left">
-              <img src="https://storage.googleapis.com/a1aa/image/6125e55a-c1bc-48e9-b448-6be01e07260d.jpg" alt="Charlene Ruto profile picture" width="32" height="32" loading="lazy" />
+              <img src="" alt="profile" width="32" height="32" loading="lazy" />
               <div class="user-info">
-                <p>Charlene Ruto</p>
-                <p class="handle">@charlruto</p>
+                <p>News Times</p>
+                <p class="handle">@newstimex</p>
               </div>
-              <i class="fas fa-check-circle verified" aria-label="Verified account"></i>
+         
             </div>
-            <button class="follow-btn" type="button">Follow</button>
+            <button class="follow-btn" type="button">Subscribe</button>
           </article>
         </div>
         <button class="more-btn" aria-label="Show more who to follow">Show more</button>
