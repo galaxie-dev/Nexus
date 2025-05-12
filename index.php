@@ -84,6 +84,11 @@
       </article>
       
     </main>
+
+
+
+
+
     <!-- Right Sidebar -->
     <aside aria-label="Right Sidebar">
       <div class="search-box" role="search">
@@ -93,31 +98,28 @@
       
       <section class="card" aria-label="What's happening">
         <h2>Suggested For You</h2>
-        <article class="wh-item">
-          <img src="https://storage.googleapis.com/a1aa/image/72de2495-ef4f-4974-4d47-eb61a242e443.jpg" alt="Going Public album cover art" width="48" height="48" loading="lazy" />
-          <div class="wh-text">
-            <p class="font-semibold">Going Public</p>
-            <p class="live">LIVE</p>
-          </div>
-        </article>
-        <div class="trending-list">
+          <div class="trending-list">
           <div>
             <p>Based on your Recent activity</p>
             <p class="trend-title">KCSC Results released</p>
             <p>Top candidate scores A plain of 84 points</p>
-            <button class="more-btn" aria-label="More options for George Natembeya">...</button>
+             <p>Top candidate scores A plain of 84 points</p>
+            <button class="more-btn" aria-label="More options for KCSE">...</button>
           </div>
           <div>
             <p>You Liked a similar post</p>
             <p class="trend-title">Mike Mueni to run for Precidency</p>
             <p>Mike Mueni Registers his Revolution Party and Confirms</p>
-            <button class="more-btn" aria-label="More options for Farouk Kibet">...</button>
+            <p>Mike Mueni Registers his Revolution Party and Confirms</p>
+            <button class="more-btn" aria-label="More options for Mike Mueni">...</button>
           </div>
           <div>
             <p>You commented on a similar post</p>
             <p class="trend-title">Man United thraches Leeds United</p>
             <p>Home derby win for the reds as they eye premier league title</p>
-            <button class="more-btn" aria-label="More options for #BanForeignHate">...</button>
+             <p>Home derby win for the reds as they eye premier league title</p>
+              <p>Home derby win for the reds as they eye premier league title</p>
+            <button class="more-btn" aria-label="More options for Leeds">...</button>
           </div>
           
           <button class="more-btn" aria-label="Show more trending topics">Show more</button>
