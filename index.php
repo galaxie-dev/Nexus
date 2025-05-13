@@ -46,9 +46,20 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
             <ul>
                 <li class="home"><a href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
                 <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>
+<<<<<<< HEAD
                 <li><a href="login.php" ><i class="fas fa-door" aria-hidden="true"></i> Login</a></li>
                 <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li>
             </ul>
+=======
+                <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li>
+                <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li>
+                <li><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</li>
+                <li><i class="fas fa-user" aria-hidden="true"></i> Profile</li>
+                <li><a href="login.php" class="post-btn" aria-label="Log in">Log In</a></li>
+                <li><a href="signup.php" class="post-btn" aria-label="Sign up">Sign Up</a></li>
+            </ul>
+            <!-- <button class="post-btn" type="button" disabled>Post</button> -->
+>>>>>>> 9a4fe6ec06fba1722e6d4eb525dc4ffec152f423
         </nav>
         <!-- Main Content -->
         <main>
@@ -73,14 +84,14 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                                     loading="lazy"
                                 />
                             <?php endif; ?>
-                            <img
+                            <!-- <img
                                 src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
                                 alt="Profile picture of Nexus"
                                 class="profile-pic"
                                 width="48"
                                 height="48"
                                 loading="lazy"
-                            />
+                            /> -->
                             <header>
                                 <span class="name">NEXUS™</span>
                                 <span class="time">@nexus · <?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>

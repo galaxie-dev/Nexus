@@ -128,7 +128,7 @@ try {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="edit-image">Image (Optional, JPEG/PNG, <5MB)</label>
+                            <label for="edit-image">Image (Optional, JPEG/PNG, <5MB)></label>
                             <input type="file" id="edit-image" name="image" accept="image/jpeg,image/png">
                             <p>Current Image: <span id="current-image"></span></p>
                         </div>
