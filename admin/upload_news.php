@@ -1,7 +1,6 @@
 <?php
-session_start();
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
+require_once '../includes/auth.php';
+require_once '../includes/db.php';
 
 requireAdmin();
 
@@ -31,7 +30,7 @@ if (!isset($_SESSION['csrf_token'])) {
                 <li><a href="index.php"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a></li>
                 <li><a href="upload_news.php"><i class="fas fa-plus" aria-hidden="true"></i> Upload News</a></li>
                 <li><a href="manage_news.php"><i class="fas fa-list" aria-hidden="true"></i> Manage News</a></li>
-                <li><a href="../logout.php" class="post-btn" aria-label="Log out">Log Out</a></li>
+                <li><a href="../includes/logout.php" class="post-btn" aria-label="Log out">Log Out</a></li>
             </ul>
         </nav>
         <!-- Main Content -->
@@ -39,6 +38,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <h1>Upload News</h1>
             <form id="upload-news-form" action="process_news.php" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <input type="hidden" name="action" value="create">
                 <div class="form-group">
                     <label for="title">Title <span class="required">*</span></label>
                     <input type="text" id="title" name="title" maxlength="100" required>
@@ -49,12 +49,34 @@ if (!isset($_SESSION['csrf_token'])) {
                 </div>
                 <div class="form-group">
                     <label for="category">Category <span class="required">*</span></label>
-                    <select id="category" name="category" required>
+                    <select id="category" name="category" onchange="toggleCustomCategory(this)" required>
+                        <option value="">Select Category</option>
                         <option value="technology">Technology</option>
                         <option value="sports">Sports</option>
                         <option value="politics">Politics</option>
                         <option value="entertainment">Entertainment</option>
+                        <option value="business">Business</option>
+                        <option value="health">Health</option>
+                        <option value="science">Science</option>
+                        <option value="world">World</option>
+                        <option value="education">Education</option>
+                        <option value="travel">Travel</option>
+                        <option value="environment">Environment</option>
+                        <option value="finance">Finance</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="food">Food</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="culture">Culture</option>
+                        <option value="crime">Crime</option>
+                        <option value="weather">Weather</option>
+                        <option value="opinion">Opinion</option>
+                        <option value="other">Other</option>
                     </select>
+                </div>
+                <div class="form-group" id="custom-category-input" style="display: none;">
+                    <label for="custom_category">Custom Category <span class="required">*</span></label>
+                    <input type="text" id="custom_category" name="custom_category" maxlength="50">
                 </div>
                 <div class="form-group">
                     <label for="image">Image (Optional, JPEG/PNG, <5MB)</label>
@@ -65,6 +87,13 @@ if (!isset($_SESSION['csrf_token'])) {
         </main>
     </div>
     <script>
+        // Toggle custom category input
+        function toggleCustomCategory(select) {
+            const customInput = document.getElementById('custom-category-input');
+            customInput.style.display = select.value === 'other' ? 'block' : 'none';
+            document.getElementById('custom_category').required = select.value === 'other';
+        }
+
         // Initialize CKEditor
         ClassicEditor
             .create(document.querySelector('#content'), {
@@ -80,11 +109,25 @@ if (!isset($_SESSION['csrf_token'])) {
         // Client-side validation
         document.getElementById('upload-news-form').addEventListener('submit', (e) => {
             const title = document.getElementById('title').value.trim();
+            const category = document.getElementById('category').value;
+            const customCategory = document.getElementById('custom_category').value.trim();
             const image = document.getElementById('image').files[0];
 
             if (title.length > 100) {
                 e.preventDefault();
                 alert('Title must be 100 characters or less.');
+                return;
+            }
+
+            if (category === 'other' && !customCategory) {
+                e.preventDefault();
+                alert('Custom category is required when "Other" is selected.');
+                return;
+            }
+
+            if (customCategory.length > 50) {
+                e.preventDefault();
+                alert('Custom category must be 50 characters or less.');
                 return;
             }
 

@@ -194,3 +194,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     };
 });
+
+let startTime = Date.now();
+document.addEventListener('scroll', () => {
+    const scrollDepth = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
+    const newsId = document.querySelector('.tweet')?.dataset.newsId;
+    if (newsId) {
+        fetch('/track.php', {
+            method: 'POST',
+            body: JSON.stringify({
+                user_id: <?php echo $_SESSION['user_id'] ?? 0; ?>,
+                news_id: newsId,
+                scroll_depth: scrollDepth,
+                dwell_time: (Date.now() - startTime) / 1000
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        }).catch(err => console.error('Track error:', err));
+    }
+});
+window.addEventListener('beforeunload', () => {
+    const newsId = document.querySelector('.tweet')?.dataset.newsId;
+    if (newsId) {
+        navigator.sendBeacon('/track.php', JSON.stringify({
+            user_id: <?php echo $_SESSION['user_id'] ?? 0; ?>,
+            news_id: newsId,
+            scroll_depth: (window.scrollY + window.innerHeight) / document.body.scrollHeight,
+            dwell_time: (Date.now() - startTime) / 1000
+        }));
+    }
+});

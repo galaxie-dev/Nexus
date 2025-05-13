@@ -44,26 +44,16 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                 <i>NEXUS</i>
             </button>
             <ul>
-                <li class="home"><i class="fas fa-home" aria-hidden="true"></i> Home</li>
+                <li class="home"><a href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
                 <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>
-                <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li>
-                <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li>
-                <li><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</li>
-                <li><i class="fas fa-user" aria-hidden="true"></i> Profile</li>
-                <li>
-                    <a href="login.php" class="post-btn" aria-label="Log in">Log In</a>
-                </li>
-                <li>
-                    <a href="signup.php" class="post-btn" aria-label="Sign up">Sign Up</a>
-                </li>
+                <li><a href="login.php" ><i class="fas fa-door" aria-hidden="true"></i> Login</a></li>
+                <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li>
             </ul>
-            <button class="post-btn" type="button" disabled>Post</button>
         </nav>
         <!-- Main Content -->
         <main>
             <div class="tabs" role="tablist" aria-label="Content tabs">
                 <button class="active" role="tab" aria-selected="true" tabindex="0">For you</button>
-                <button role="tab" aria-selected="false" tabindex="-1" disabled>Following</button>
             </div>
             <?php if (isset($error)): ?>
                 <p class="error"><?php echo htmlspecialchars($error); ?></p>
