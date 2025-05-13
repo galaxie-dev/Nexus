@@ -1,3 +1,22 @@
+<?php
+// Database connection settings
+$host = 'localhost'; 
+$db = 'nexus';
+$user = 'root';
+$pass = '';
+
+// Create connection
+$conn = new mysqli($host, $user, $pass, $db);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch latest news
+$sql = "SELECT * FROM news_card ORDER BY created_at DESC LIMIT 10";
+$result = $conn->query($sql);
+?>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -32,11 +51,11 @@
         <button class="active" role="tab" aria-selected="true" tabindex="0">For you</button>
         <button role="tab" aria-selected="false" tabindex="-1">Following</button>
       </div>
-      <!-- Tweet 1 -->
-      <article class="tweet" aria-label="Tweet by JUST MIH™">
-       
-        <div class="content">
-        
+
+
+      <!-- news 1 -->
+      <!-- <article class="tweet" aria-label="Tweet by JUST MIH™">       
+        <div class="content">        
           <img
             src="https://storage.googleapis.com/a1aa/image/73214d66-2621-4b7b-7019-508c964121a5.jpg"
             alt="View from inside a car showing a dog sitting in the passenger seat looking back"
@@ -81,7 +100,59 @@
             <div><i class="fas fa-upload" aria-hidden="true"></i></div>
           </footer>
         </div>
-      </article>
+      </article> -->
+
+
+
+      <?php if ($result->num_rows > 0): ?>
+  <?php while($row = $result->fetch_assoc()): ?>
+    <article class="tweet" aria-label="News post">
+      <div class="content">
+        <?php if (!empty($row['image_path'])): ?>
+          <img
+            src="<?= htmlspecialchars($row['image_path']) ?>"
+            alt="News image"
+            class="tweet-image"
+            width="600"
+            height="300"
+            loading="lazy"
+          />
+        <?php endif; ?>
+
+        <img
+          src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
+          alt="Profile picture of a user with a dog"
+          class="profile-pic"
+          width="48"
+          height="48"
+          loading="lazy"
+        />
+
+        <header>
+          <span class="name">NEXUS™</span>
+          <span class="time">@nexus · <?= date("M j", strtotime($row['created_at'])) ?></span>
+          <button class="more-btn" aria-label="More options">
+            <div><i class="far fa-bookmark" aria-hidden="true"></i></div>
+          </button>
+        </header>
+
+        <p class="text">
+          <strong><?= htmlspecialchars($row['title']) ?></strong><br />
+          <?= nl2br(htmlspecialchars($row['content'])) ?>
+        </p>
+
+        <footer>
+          <div><i class="far fa-comment" aria-hidden="true"></i> 0</div>
+          <div><i class="far fa-heart" aria-hidden="true"></i> <?= $row['likes'] ?></div>
+          <div><i class="fas fa-chart-bar" aria-hidden="true"></i> views</div>
+          <div><i class="fas fa-upload" aria-hidden="true"></i></div>
+        </footer>
+      </div>
+    </article>
+  <?php endwhile; ?>
+<?php else: ?>
+  <p>No news available.</p>
+<?php endif; ?>
       
     </main>
 
