@@ -6,6 +6,8 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('Connection: keep-alive');
 
+file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - SSE connection opened\n", FILE_APPEND);
+
 function sendEvent($data) {
     echo "data: " . json_encode($data) . "\n\n";
     ob_flush();
@@ -58,6 +60,7 @@ while (true) {
 
         // Prevent infinite loop
         if (connection_aborted()) {
+            file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - SSE connection aborted\n", FILE_APPEND);
             break;
         }
 
@@ -71,7 +74,7 @@ while (true) {
         }
     } catch (PDOException $e) {
         sendEvent(['type' => 'error', 'message' => 'Database error']);
-        error_log('SSE failed: ' . $e->getMessage());
+        file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - SSE failed: " . $e->getMessage() . "\n", FILE_APPEND);
         break;
     }
 }

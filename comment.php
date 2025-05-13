@@ -4,13 +4,14 @@ require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
 header('Content-Type: application/json');
+file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Comment request received\n", FILE_APPEND);
 
 $response = ['success' => false, 'message' => ''];
 
 // CSRF token validation
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     $response['message'] = 'Invalid CSRF token';
-    error_log('Comment failed: Invalid CSRF token');
+    file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Comment failed: Invalid CSRF token\n", FILE_APPEND);
     echo json_encode($response);
     exit;
 }
@@ -28,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'], $_POST['co
 
     if (!$news_id || empty($content) || strlen($content) > 280) {
         $response['message'] = 'Invalid news ID or comment (max 280 characters)';
-        error_log('Comment failed: Invalid input');
+        file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Comment failed: Invalid input\n", FILE_APPEND);
         echo json_encode($response);
         exit;
     }
@@ -59,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'], $_POST['co
     } catch (PDOException $e) {
         $pdo->rollBack();
         $response['message'] = 'Database error';
-        error_log('Comment failed: ' . $e->getMessage());
+        file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Comment failed: " . $e->getMessage() . "\n", FILE_APPEND);
     }
 } else {
     $response['message'] = 'Invalid request';
-    error_log('Comment failed: Invalid request');
+    file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Comment failed: Invalid request\n", FILE_APPEND);
 }
 
 echo json_encode($response);

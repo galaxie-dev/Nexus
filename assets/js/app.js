@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Behavioral tracking
+    // Behavioral tracking for clicks
     document.querySelectorAll('.tweet').forEach(tweet => {
         tweet.addEventListener('click', (e) => {
             if (e.target.closest('.like-btn, .comment-btn, .share-btn, .comment-form')) return;
@@ -17,11 +17,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Mood tracking prep: Scroll and dwell time
+    let lastScroll = 0, startTime = Date.now();
+    document.addEventListener('scroll', () => {
+        const currentScroll = window.scrollY;
+        const scrollSpeed = Math.abs(currentScroll - lastScroll) / (Date.now() - startTime);
+        lastScroll = currentScroll;
+        startTime = Date.now();
+        console.log('Scroll speed:', scrollSpeed); // For debugging
+        // Future: Send scrollSpeed to server
+    });
+
+    document.querySelectorAll('.tweet').forEach(tweet => {
+        let dwellStart = null;
+        tweet.addEventListener('mouseenter', () => {
+            dwellStart = Date.now();
+        });
+        tweet.addEventListener('mouseleave', () => {
+            if (dwellStart) {
+                const dwellTime = Date.now() - dwellStart;
+                console.log('Dwell time on news', tweet.dataset.newsId, ':', dwellTime, 'ms');
+                // Future: Send dwellTime to server
+            }
+        });
+    });
+
     // Like buttons
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', () => {
             if (button.disabled) return;
             const newsId = button.dataset.newsId;
+            console.log('Like attempt for news:', newsId);
             button.classList.add('animate-like');
             setTimeout(() => button.classList.remove('animate-like'), 300);
             fetch('like.php', {
@@ -30,10 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: `news_id=${newsId}&csrf_token=${encodeURIComponent(csrfToken)}`
             })
             .then(response => {
-                if (!response.ok) throw new Error('Network error');
+                console.log('Like response status:', response.status);
+                if (!response.ok) throw new Error('Network error: ' + response.status);
                 return response.json();
             })
             .then(data => {
+                console.log('Like response data:', data);
                 if (data.success) {
                     const likesSpan = document.getElementById(`likes${newsId}`);
                     likesSpan.textContent = data.likes;
@@ -55,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             if (button.disabled) return;
             const newsId = button.dataset.newsId;
+            console.log('Comment form toggle for news:', newsId);
             const form = document.querySelector(`.comment-form[data-news-id="${newsId}"]`);
             form.style.display = form.style.display === 'none' ? 'flex' : 'none';
             if (form.style.display === 'flex') form.querySelector('textarea').focus();
@@ -68,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newsId = form.dataset.newsId;
             const content = form.querySelector('textarea').value.trim();
             if (!content) return;
+            console.log('Comment submit for news:', newsId, 'Content:', content);
 
             fetch('comment.php', {
                 method: 'POST',
@@ -75,10 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: `news_id=${newsId}&content=${encodeURIComponent(content)}&csrf_token=${encodeURIComponent(csrfToken)}`
             })
             .then(response => {
-                if (!response.ok) throw new Error('Network error');
+                console.log('Comment response status:', response.status);
+                if (!response.ok) throw new Error('Network error: ' + response.status);
                 return response.json();
             })
             .then(data => {
+                console.log('Comment response data:', data);
                 if (data.success) {
                     form.querySelector('textarea').value = '';
                     form.style.display = 'none';
@@ -130,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const source = new EventSource('includes/sse.php');
     source.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        console.log('SSE event:', data);
         if (data.type === 'like') {
             const likesSpan = document.getElementById(`likes${data.news_id}`);
             if (likesSpan) likesSpan.textContent = data.likes;

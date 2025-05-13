@@ -4,13 +4,14 @@ require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
 header('Content-Type: application/json');
+file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Like request received\n", FILE_APPEND);
 
 $response = ['success' => false, 'message' => ''];
 
 // CSRF token validation
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     $response['message'] = 'Invalid CSRF token';
-    error_log('Like failed: Invalid CSRF token');
+    file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Like failed: Invalid CSRF token\n", FILE_APPEND);
     echo json_encode($response);
     exit;
 }
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'])) {
 
     if (!$news_id) {
         $response['message'] = 'Invalid news ID';
-        error_log('Like failed: Invalid news ID');
+        file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Like failed: Invalid news ID\n", FILE_APPEND);
         echo json_encode($response);
         exit;
     }
@@ -71,11 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'])) {
     } catch (PDOException $e) {
         $pdo->rollBack();
         $response['message'] = 'Database error';
-        error_log('Like failed: ' . $e->getMessage());
+        file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Like failed: " . $e->getMessage() . "\n", FILE_APPEND);
     }
 } else {
     $response['message'] = 'Invalid request';
-    error_log('Like failed: Invalid request');
+    file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Like failed: Invalid request\n", FILE_APPEND);
 }
 
 echo json_encode($response);

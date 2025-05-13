@@ -30,4 +30,30 @@ function logout() {
     session_unset();
     session_destroy();
 }
+
+function isAdmin() {
+    if (!isLoggedIn()) {
+        return false;
+    }
+    require_once 'db.php';
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT is_admin FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+    return $user && $user['is_admin'] == 1;
+}
+
+function requireLogin() {
+    if (!isLoggedIn()) {
+        header('Location: ../index.php');
+        exit;
+    }
+}
+
+function requireAdmin() {
+    if (!isAdmin()) {
+        header('Location: ../index.php');
+        exit;
+    }
+}
 ?>
