@@ -8,13 +8,13 @@ if (!isLoggedIn()) header("Location: login.php");
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewsBlend</title>
+  <title>Nexus</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen">
   <!-- Header -->
   <header class="sticky top-0 bg-gray-800 p-4 flex justify-between items-center">
-    <h1 class="text-xl font-bold text-white">NewsBlend</h1>
+    <h1 class="text-xl font-bold text-white">Nexus</h1>
     <div class="flex space-x-4">
       <button id="anonymousToggle" class="bg-purple-600 px-3 py-1 rounded-full text-sm">
         Anonymous Mode
