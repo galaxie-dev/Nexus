@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'newsblend';
+$dbname = 'nexus';
 $username = 'root';
 $password = '';
 

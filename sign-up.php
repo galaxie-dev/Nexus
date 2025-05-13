@@ -12,6 +12,7 @@
     <h2>Create a Nexus Account</h2>
     <form>
       <input type="email" placeholder="Email" required />
+      <input type="name" placeholder="Username" required />
       <input type="password" placeholder="Password" required />
       <input type="password" placeholder="Confirm Password" required />
       <button type="submit">Sign In</button>
