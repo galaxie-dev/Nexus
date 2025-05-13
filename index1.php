@@ -120,14 +120,14 @@ $is_anonymous = isset($_SESSION['anonymous']) && $_SESSION['anonymous'];
                     <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>" data-news-id="<?php echo $news['id']; ?>">
                         <div class="content">
                             <div class="tweet-header">
-                                <img
+                                <!-- <img
                                     src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
                                     alt="Profile picture of Nexus"
                                     class="profile-pic"
                                     width="48"
                                     height="48"
                                     loading="lazy"
-                                />
+                                /> -->
                                 <div>
                                     <span class="name">NEXUS™</span>
                                     <span class="time">@nexus · <?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>

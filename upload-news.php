@@ -1,4 +1,17 @@
 <?php
+session_start();
+require_once 'includes/db.php';
+require_once 'includes/auth.php';
+
+requireAdmin();
+
+// Generate CSRF token
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
+
+<?php
 $host = "localhost";
 $user = "root";
 $password = "";
