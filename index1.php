@@ -1,9 +1,15 @@
 <?php
-session_start();
+require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
+// Redirect if not logged in
+if (!isLoggedIn() && !(isset($_SESSION['anonymous']) && $_SESSION['anonymous'])) {
+    header('Location: index.php');
+    exit;
+}
+
 // Fetch cached news or query database
-$cache_key = 'news_public_cache';
+$cache_key = 'news_user_cache';
 $cache_ttl = 300; // 5 minutes
 $news_items = [];
 
@@ -14,7 +20,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
         $stmt = $pdo->query("SELECT id, title, content, category, image_path, likes, created_at 
                             FROM news_card 
                             ORDER BY created_at DESC 
-                            LIMIT 5");
+                            LIMIT 10");
         $news_items = $stmt->fetchAll();
         $_SESSION[$cache_key] = [
             'data' => $news_items,
@@ -25,6 +31,8 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
         $error = "Failed to load news: " . $e->getMessage();
     }
 }
+
+$is_anonymous = isset($_SESSION['anonymous']) && $_SESSION['anonymous'];
 ?>
 
 <!DOCTYPE html>
@@ -51,19 +59,27 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                 <li><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</li>
                 <li><i class="fas fa-user" aria-hidden="true"></i> Profile</li>
                 <li>
-                    <a href="login.php" class="post-btn" aria-label="Log in">Log In</a>
+                    <i class="fas fa-user-circle" aria-hidden="true"></i> 
+                    <?php echo $is_anonymous ? 'Anonymous User' : htmlspecialchars($_SESSION['username']); ?>
                 </li>
+                <?php if (!$is_anonymous): ?>
+                    <li>
+                        <a href="includes/logout.php" class="post-btn" aria-label="Log out">Log Out</a>
+                    </li>
+                <?php endif; ?>
                 <li>
-                    <a href="signup.php" class="post-btn" aria-label="Sign up">Sign Up</a>
+                    <a href="anonymous.php" class="post-btn" aria-label="Toggle anonymous mode">
+                        <?php echo $is_anonymous ? 'Exit Anonymous Mode' : 'Anonymous Mode'; ?>
+                    </a>
                 </li>
             </ul>
-            <button class="post-btn" type="button" disabled>Post</button>
+            <button class="post-btn" type="button">Post</button>
         </nav>
         <!-- Main Content -->
         <main>
             <div class="tabs" role="tablist" aria-label="Content tabs">
                 <button class="active" role="tab" aria-selected="true" tabindex="0">For you</button>
-                <button role="tab" aria-selected="false" tabindex="-1" disabled>Following</button>
+                <button role="tab" aria-selected="false" tabindex="-1">Following</button>
             </div>
             <?php if (isset($error)): ?>
                 <p class="error"><?php echo htmlspecialchars($error); ?></p>
@@ -71,7 +87,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                 <p>No news items available.</p>
             <?php else: ?>
                 <?php foreach ($news_items as $news): ?>
-                    <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>">
+                    <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>" data-news-id="<?php echo $news['id']; ?>">
                         <div class="content">
                             <?php if ($news['image_path']): ?>
                                 <img
@@ -94,27 +110,32 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                             <header>
                                 <span class="name">NEXUS™</span>
                                 <span class="time">@nexus · <?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>
+                                <button class="more-btn" aria-label="More options"><i class="far fa-bookmark" aria-hidden="true"></i></button>
                             </header>
                             <h3><?php echo htmlspecialchars($news['title']); ?></h3>
                             <p class="text"><?php echo htmlspecialchars($news['content']); ?></p>
                             <p class="category">Category: <?php echo htmlspecialchars(ucfirst($news['category'])); ?></p>
                             <footer>
                                 <div><i class="far fa-comment" aria-hidden="true"></i> 0</div>
-                                <div><i class="far fa-heart" aria-hidden="true"></i> <?php echo $news['likes']; ?></div>
+                                <div>
+                                    <button class="like-btn" data-news-id="<?php echo $news['id']; ?>">
+                                        <i class="far fa-heart" aria-hidden="true"></i> 
+                                        <span id="likes<?php echo $news['id']; ?>"><?php echo $news['likes']; ?></span>
+                                    </button>
+                                </div>
                                 <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 0</div>
                                 <div><i class="fas fa-upload" aria-hidden="true"></i></div>
                             </footer>
                         </div>
                     </article>
                 <?php endforeach; ?>
-                <p class="signup-prompt">Log in or sign up to see more news and interact!</p>
             <?php endif; ?>
         </main>
         <!-- Right Sidebar -->
         <aside aria-label="Right Sidebar">
             <div class="search-box" role="search">
-                <input type="search" placeholder="Search" aria-label="Search" disabled />
-                <button aria-label="Search button" disabled><i class="fas fa-search" aria-hidden="true"></i></button>
+                <input type="search" placeholder="Search" aria-label="Search" />
+                <button aria-label="Search button"><i class="fas fa-search" aria-hidden="true"></i></button>
             </div>
             <section class="card" aria-label="What's happening">
                 <h2>Suggested For You</h2>
@@ -151,7 +172,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                                 <p class="handle">@nasa</p>
                             </div>
                         </div>
-                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                        <button class="follow-btn" type="button">Subscribe</button>
                     </article>
                     <article>
                         <div class="follow-left">
@@ -161,7 +182,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                                 <p class="handle">@nexus</p>
                             </div>
                         </div>
-                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                        <button class="follow-btn" type="button">Subscribe</button>
                     </article>
                     <article>
                         <div class="follow-left">
@@ -171,7 +192,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                                 <p class="handle">@newstimex</p>
                             </div>
                         </div>
-                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                        <button class="follow-btn" type="button">Subscribe</button>
                     </article>
                 </div>
                 <button class="more-btn" aria-label="Show more who to follow">Show more</button>
@@ -185,5 +206,24 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
             </footer>
         </aside>
     </div>
+    <script>
+        // Placeholder for behavioral tracking
+        document.querySelectorAll('.tweet').forEach(tweet => {
+            tweet.addEventListener('click', () => {
+                const newsId = tweet.dataset.newsId;
+                console.log(`Clicked news ID: ${newsId}`);
+                // Future: Send click data to user_behavior table via AJAX
+            });
+        });
+
+        // Placeholder for like button (to be implemented in Phase 2)
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const newsId = button.dataset.newsId;
+                console.log(`Like clicked for news ID: ${newsId}`);
+                // Future: Send like request to like.php
+            });
+        });
+    </script>
 </body>
 </html>

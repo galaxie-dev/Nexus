@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if (register($email, $username, $password)) {
                 if (login($email, $password)) {
-                    header('Location: index.php');
+                    header('Location: login.php');
                     exit;
                 }
             }
