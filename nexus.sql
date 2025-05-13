@@ -243,3 +243,12 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- update table
+ALTER TABLE news_card 
+MODIFY category ENUM(
+  'technology','sports','politics','entertainment','business','health',
+  'science','world','education','travel','environment','finance','fashion',
+  'lifestyle','food','automotive','culture','crime','weather','opinion','other'
+) NOT NULL;
