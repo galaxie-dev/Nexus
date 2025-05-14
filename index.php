@@ -13,8 +13,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
     try {
         $stmt = $pdo->query("SELECT id, title, content, category, image_path, likes, created_at 
                             FROM news_card 
-                            ORDER BY created_at DESC 
-                            LIMIT 5");
+                            ORDER BY created_at DESC");
         $news_items = $stmt->fetchAll();
         $_SESSION[$cache_key] = [
             'data' => $news_items,
@@ -32,7 +31,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nexus</title>
+    <title>Nexus | Book</title>
     <link href="style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
@@ -44,15 +43,15 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                 <i>NEXUS</i>
             </button>
             <ul>
-                <li class="home"><a href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>  
-                <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li>
-                <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li>
-                <li><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</li>
-                <li><i class="fas fa-user" aria-hidden="true"><a href=user-dash.php><</i> Profile</li>         
+                <li class="home"><a style="text-decoration: none;" href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
+                <!-- <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>   -->
+                <!-- <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li> -->
+                <!-- <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li> -->
+                <!-- <li><a href="bookmarks.php" style="text-decoration: none;"><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</a></li> -->
+                <!-- <li><i class="fas fa-user" aria-hidden="true"><a href=user-dash.php></i> Profile</li>          -->
             
-                <li><a href="login.php" ><i class="fas fa-door" aria-hidden="true"></i> Login</a></li>
-                <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li>
+                <li><a href="login.php" style="text-decoration: none;"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Login</a></li>
+                <!-- <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li> -->
             </ul>
         </nav>
         <!-- Main Content -->
@@ -105,6 +104,8 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                 <p class="signup-prompt">Log in or sign up to see more news and interact!</p>
             <?php endif; ?>
         </main>
+
+        
         <!-- Right Sidebar -->
         <aside aria-label="Right Sidebar">
             <div class="search-box" role="search">

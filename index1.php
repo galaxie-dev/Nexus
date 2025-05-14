@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
@@ -7,16 +7,27 @@ requireLogin();
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch initial news (server-side, fallback to adjust-mood.php for mood-based)
-try {
-    $stmt = $pdo->query("SELECT id, title, content, category, image_path, likes, created_at 
-                         FROM news_card 
-                         ORDER BY created_at DESC 
-                         LIMIT 10");
-    $news_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $error = "Failed to load news";
-    file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - News fetch failed: " . $e->getMessage() . "\n", FILE_APPEND);
+// Fetch cached news or query database
+$cache_key = 'news_public_cache';
+$cache_ttl = 300; // 5 minutes
+$news_items = [];
+
+if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']) < $cache_ttl) {
+    $news_items = $_SESSION[$cache_key]['data'];
+} else {
+    try {
+        $stmt = $pdo->query("SELECT id, title, content, category, image_path, likes, created_at 
+                            FROM news_card 
+                            ORDER BY created_at DESC");
+        $news_items = $stmt->fetchAll();
+        $_SESSION[$cache_key] = [
+            'data' => $news_items,
+            'timestamp' => time()
+        ];
+    } catch (PDOException $e) {
+        $news_items = [];
+        $error = "Failed to load news: " . $e->getMessage();
+    }
 }
 ?>
 
@@ -25,163 +36,153 @@ try {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nexus - Home</title>
+    <title>Nexus | Home</title>
     <link href="style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/onnx@0.0.7/dist/onnx.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
 </head>
 <body>
     <div class="container" role="main">
-        <!-- Fixed Sidebar -->
-        <nav class="fixed-sidebar" aria-label="Primary Navigation">
-            <button class="close-btn" aria-label="Close menu"><i>NEXUS</i></button>
+        <!-- Left Sidebar -->
+        <nav aria-label="Primary Navigation">
+            <button class="close-btn" aria-label="Close menu">
+                <i>NEXUS</i>
+            </button>
             <ul>
-                <li class="home"><a href="index_after.php"><i billie="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <?php if (isAdmin()): ?>
-                    <li><a href="admin/index.php"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Admin Dashboard</a></li>
-                <?php endif; ?>
-                <li><a href="includes/logout.php" class="post-btn" aria-label="Log out">Log Out</a></li>
+                <li class="home"><a style="text-decoration: none;" href=index1.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
+                 <li><a href="bookmarks.php" style="text-decoration: none;"><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</a></li> 
+                 <li><i class="fas fa-user" aria-hidden="true"><a href=user-dash.php style="text-decoration: none;"></i> Profile</li>   
+                 <!-- <li><i class="fas fa-sign-out-alt" aria-hidden="true"><a href=user-dash.php style="text-decoration: none;"></i> Profile</li>        -->
+          
+                <li><a href="index.php" style="text-decoration: none;"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Log Out</a></li>
+                <!-- <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li> -->
             </ul>
         </nav>
         <!-- Main Content -->
-        <main class="main-content">
-            <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username'] ?: $_SESSION['admin_username']); ?>!</h1>
-            <!-- <div id="mood-status">Loading mood...</div>
-            <?php if (isset($error)): ?> -->
+        <main>
+            <div class="tabs" role="tablist" aria-label="Content tabs">
+                <button class="active" role="tab" aria-selected="true" tabindex="0">For you</button>
+            </div>
+            <?php if (isset($error)): ?>
                 <p class="error"><?php echo htmlspecialchars($error); ?></p>
             <?php elseif (empty($news_items)): ?>
-                <p>No news available.</p>
+                <p>No news items available.</p>
             <?php else: ?>
-                <div id="news-feed">
-                    <?php foreach ($news_items as $news): ?>
-                        <article class="tweet" data-news-id="<?php echo $news['id']; ?>">
-                            <div class="tweet-header">
-                                <div>
-                                    <span class="name">Nexus News</span>
-                                    <span class="category"><?php echo htmlspecialchars(ucfirst($news['category'])); ?></span>
-                                    <span class="time"><?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>
-                                </div>
-                            </div>
-                            <h3 class="tweet-title"><?php echo htmlspecialchars($news['title']); ?></h3>
-                            <div class="tweet-text"><?php echo htmlspecialchars(substr($news['content'], 0, 200)); ?>...</div>
+                <?php foreach ($news_items as $news): ?>
+                    <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>">
+                        <div class="content">
                             <?php if ($news['image_path']): ?>
-                                <img src="<?php echo htmlspecialchars($news['image_path']); ?>" class="tweet-image" alt="News image">
+                                <img
+                                    src="<?php echo htmlspecialchars($news['image_path']); ?>"
+                                    alt="Image for news: <?php echo htmlspecialchars($news['title']); ?>"
+                                    class="tweet-image"
+                                    width="600"
+                                    height="300"
+                                    loading="lazy"
+                                />
                             <?php endif; ?>
-                            <div class="tweet-footer">
-                                <div>
-                                    <button class="like-btn" data-news-id="<?php echo $news['id']; ?>">
-                                        <i class="fas fa-heart"></i> <span><?php echo $news['likes']; ?></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
+                            <!-- <img
+                                src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
+                                alt="Profile picture of Nexus"
+                                class="profile-pic"
+                                width="48"
+                                height="48"
+                                loading="lazy"
+                            /> -->
+                            <header>
+                                <span class="name">NEXUS™</span>
+                                <span class="time">@nexus · <?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>
+                            </header>
+                            <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                            <p class="text"><?php echo htmlspecialchars($news['content']); ?></p>
+                            <p class="category">Category: <?php echo htmlspecialchars(ucfirst($news['category'])); ?></p>
+                            <footer>
+                                <div><i class="far fa-comment" aria-hidden="true"></i> 0</div>
+                                <div><i class="far fa-heart" aria-hidden="true"></i> <?php echo $news['likes']; ?></div>
+                                <!-- <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 0</div> -->
+                                <div><i class="fas fa-upload" aria-hidden="true"></i></div>
+                            </footer>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+                <p class="signup-prompt">Log in or sign up to see more news and interact!</p>
             <?php endif; ?>
         </main>
+
+        
+        <!-- Right Sidebar -->
+        <aside aria-label="Right Sidebar">
+            <div class="search-box" role="search">
+                <input type="search" placeholder="Search" aria-label="Search" disabled />
+                <button aria-label="Search button" disabled><i class="fas fa-search" aria-hidden="true"></i></button>
+            </div>
+            <section class="card" aria-label="What's happening">
+                <h2>Suggested For You</h2>
+                <div class="trending-list">
+                    <div>
+                        <p>Based on recent activity</p>
+                        <p class="trend-title">KCSE Results Released</p>
+                        <p>Top candidate scores A plain of 84 points</p>
+                        <button class="more-btn" aria-label="More options for KCSE">...</button>
+                    </div>
+                    <div>
+                        <p>Trending in politics</p>
+                        <p class="trend-title">Mike Mueni to Run for Presidency</p>
+                        <p>Mike Mueni registers his Revolution Party and confirms</p>
+                        <button class="more-btn" aria-label="More options for Mike Mueni">...</button>
+                    </div>
+                    <div>
+                        <p>Trending in sports</p>
+                        <p class="trend-title">Man United Thrashes Leeds United</p>
+                        <p>Home derby win for the reds as they eye Premier League title</p>
+                        <button class="more-btn" aria-label="More options for Leeds">...</button>
+                    </div>
+                    <button class="more-btn" aria-label="Show more trending topics">Show more</button>
+                </div>
+            </section>
+            <section class="card" aria-label="Who to follow">
+                <h2>Subscribe to these News Outlets</h2>
+                <div class="follow-list">
+                    <article>
+                        <div class="follow-left">
+                            <img src="https://via.placeholder.com/32" alt="NASA profile picture" width="32" height="32" loading="lazy" />
+                            <div class="user-info">
+                                <p>NASA</p>
+                                <p class="handle">@nasa</p>
+                            </div>
+                        </div>
+                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                    </article>
+                    <article>
+                        <div class="follow-left">
+                            <!-- <img src="https://via.placeholder.com/32" alt="Nexus profile picture" width="32" height="32" loading="lazy" /> -->
+                            <div class="user-info">
+                                <p>NEXUS</p>
+                                <p class="handle">@nexus</p>
+                            </div>
+                        </div>
+                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                    </article>
+                    <article>
+                        <div class="follow-left">
+                            <img src="https://via.placeholder.com/32" alt="News Times profile picture" width="32" height="32" loading="lazy" />
+                            <div class="user-info">
+                                <p>News Times</p>
+                                <p class="handle">@newstimex</p>
+                            </div>
+                        </div>
+                        <button class="follow-btn" type="button" disabled>Subscribe</button>
+                    </article>
+                </div>
+                <button class="more-btn" aria-label="Show more who to follow">Show more</button>
+            </section>
+            <footer class="footer" aria-label="Footer">
+                <p>Terms of Service</p>
+                <span>|</span>
+                <p>Privacy Policy</p>
+                <span>|</span>
+                <p>Cookie Policy</p>
+            </footer>
+        </aside>
     </div>
-    <script src="assets/js/app.js"></script>
-    <script>
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(() => console.log('Service Worker Registered'))
-                .catch(err => console.error('Service Worker Error:', err));
-        }
-
-        // Initialize IndexedDB
-        async function initDB() {
-            const db = await idb.openDB('nexus-db', 1, {
-                upgrade(db) {
-                    db.createObjectStore('news', { keyPath: 'id' });
-                }
-            });
-            // Cache news from server
-            if (navigator.onLine) {
-                fetch('/api/news.php')
-                    .then(res => res.json())
-                    .then(news => {
-                        const tx = db.transaction('news', 'readwrite');
-                        news.forEach(item => tx.store.put(item));
-                        return tx.done;
-                    })
-                    .catch(err => console.error('News cache error:', err));
-            }
-            // Display offline news
-            if (!navigator.onLine) {
-                const news = await db.getAll('news');
-                displayNews(news);
-            }
-        }
-        initDB();
-
-        // Display news function
-        function displayNews(newsItems) {
-            const feed = document.getElementById('news-feed');
-            feed.innerHTML = '';
-            if (!newsItems.length) {
-                feed.innerHTML = '<p>No news available offline.</p>';
-                return;
-            }
-            newsItems.forEach(news => {
-                const article = document.createElement('article');
-                article.className = 'tweet';
-                article.dataset.newsId = news.id;
-                article.innerHTML = `
-                    <div class="tweet-header">
-                        <div>
-                            <span class="name">Nexus News</span>
-                            <span class="category">${news.category}</span>
-                            <span class="time">${new Date(news.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                        </div>
-                    </div>
-                    <h3 class="tweet-title">${news.title}</h3>
-                    <div class="tweet-text">${news.content.substring(0, 200)}...</div>
-                    ${news.image_path ? `<img src="${news.image_path}" class="tweet-image" alt="News image">` : ''}
-                    <div class="tweet-footer">
-                        <div>
-                            <button class="like-btn" data-news-id="${news.id}">
-                                <i class="fas fa-heart"></i> <span>${news.likes}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                feed.appendChild(article);
-            });
-        }
-
-        // Mood detection and content adjustment
-        async function updateMood() {
-            try {
-                // Fetch features
-                const featuresRes = await fetch('/features.php');
-                const features = await featuresRes.json();
-                // Predict mood (client-side ONNX)
-                const session = await ort.InferenceSession.create('/mood_model.onnx');
-                const tensor = new ort.Tensor('float32', [features.avg_scroll || 0, features.avg_dwell || 0], [1, 2]);
-                const feeds = { input: tensor };
-                const results = await session.run(feeds);
-                const mood = results.output.data[0] > 0.5 ? 'positive' : 'negative';
-                document.getElementById('mood-status').textContent = `Mood: ${mood}`;
-                // Fetch mood-based news
-                const newsRes = await fetch(`/adjust-mood.php?mood=${mood}`);
-                const news = await newsRes.json();
-                displayNews(news);
-                // Update IndexedDB
-                const db = await idb.openDB('nexus-db', 1);
-                const tx = db.transaction('news', 'readwrite');
-                news.forEach(item => tx.store.put(item));
-                await tx.done;
-            } catch (err) {
-                console.error('Mood update error:', err);
-                document.getElementById('mood-status').textContent = 'Mood detection failed';
-            }
-        }
-        // Initial mood update
-        if (navigator.onLine) {
-            updateMood();
-        }
-    </script>
 </body>
 </html>

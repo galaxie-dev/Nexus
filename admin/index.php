@@ -27,7 +27,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <ul>
                 <li class="home"><a href="../index_after.php"><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
                 <li><a href="index.php"><i class="fas fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a></li>
-                <li><a href="upload_news.php"><i class="fas fa-plus" aria-hidden="true"></i> Upload News</a></li>
+                <li><a href="../upload_news.php"><i class="fas fa-plus" aria-hidden="true"></i> Upload News</a></li>
                 <li><a href="manage_news.php"><i class="fas fa-list" aria-hidden="true"></i> Manage News</a></li>
                 <li><a href="../includes/logout.php" class="post-btn" aria-label="Log out">Log Out</a></li>
             </ul>
