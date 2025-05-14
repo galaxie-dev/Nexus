@@ -45,21 +45,15 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
             </button>
             <ul>
                 <li class="home"><a href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>
-<<<<<<< HEAD
-                <li><a href="login.php" ><i class="fas fa-door" aria-hidden="true"></i> Login</a></li>
-                <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li>
-            </ul>
-=======
+                <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>  
                 <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li>
                 <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li>
                 <li><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</li>
-                <li><i class="fas fa-user" aria-hidden="true"></i> Profile</li>
-                <li><a href="login.php" class="post-btn" aria-label="Log in">Log In</a></li>
-                <li><a href="signup.php" class="post-btn" aria-label="Sign up">Sign Up</a></li>
+                <li><i class="fas fa-user" aria-hidden="true"><a href=user-dash.php><</i> Profile</li>         
+            
+                <li><a href="login.php" ><i class="fas fa-door" aria-hidden="true"></i> Login</a></li>
+                <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li>
             </ul>
-            <!-- <button class="post-btn" type="button" disabled>Post</button> -->
->>>>>>> 9a4fe6ec06fba1722e6d4eb525dc4ffec152f423
         </nav>
         <!-- Main Content -->
         <main>
@@ -102,7 +96,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                             <footer>
                                 <div><i class="far fa-comment" aria-hidden="true"></i> 0</div>
                                 <div><i class="far fa-heart" aria-hidden="true"></i> <?php echo $news['likes']; ?></div>
-                                <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 0</div>
+                                <!-- <div><i class="fas fa-chart-bar" aria-hidden="true"></i> 0</div> -->
                                 <div><i class="fas fa-upload" aria-hidden="true"></i></div>
                             </footer>
                         </div>
@@ -156,7 +150,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                     </article>
                     <article>
                         <div class="follow-left">
-                            <img src="https://via.placeholder.com/32" alt="Nexus profile picture" width="32" height="32" loading="lazy" />
+                            <!-- <img src="https://via.placeholder.com/32" alt="Nexus profile picture" width="32" height="32" loading="lazy" /> -->
                             <div class="user-info">
                                 <p>NEXUS</p>
                                 <p class="handle">@nexus</p>

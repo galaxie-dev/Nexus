@@ -47,8 +47,8 @@ try {
         <!-- Main Content -->
         <main class="main-content">
             <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username'] ?: $_SESSION['admin_username']); ?>!</h1>
-            <div id="mood-status">Loading mood...</div>
-            <?php if (isset($error)): ?>
+            <!-- <div id="mood-status">Loading mood...</div>
+            <?php if (isset($error)): ?> -->
                 <p class="error"><?php echo htmlspecialchars($error); ?></p>
             <?php elseif (empty($news_items)): ?>
                 <p>No news available.</p>
@@ -57,17 +57,6 @@ try {
                     <?php foreach ($news_items as $news): ?>
                         <article class="tweet" data-news-id="<?php echo $news['id']; ?>">
                             <div class="tweet-header">
-<<<<<<< HEAD
-=======
-                                <!-- <img
-                                    src="https://storage.googleapis.com/a1aa/image/37126454-0da0-4eb4-cfd0-c6a2ec411163.jpg"
-                                    alt="Profile picture of Nexus"
-                                    class="profile-pic"
-                                    width="48"
-                                    height="48"
-                                    loading="lazy"
-                                /> -->
->>>>>>> 9a4fe6ec06fba1722e6d4eb525dc4ffec152f423
                                 <div>
                                     <span class="name">Nexus News</span>
                                     <span class="category"><?php echo htmlspecialchars(ucfirst($news['category'])); ?></span>
