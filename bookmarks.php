@@ -38,7 +38,7 @@ try {
         <nav class="fixed-sidebar" aria-label="Primary Navigation">
             <button class="close-btn" aria-label="Close menu"><i>NEXUS</i></button>
             <ul>
-                <li class="home"><a style="text-decoration: none;" href=index.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
+                <li class="home"><a style="text-decoration: none;" href=index1.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
                 <!-- <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>   -->
                 <!-- <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li> -->
                 <!-- <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li> -->

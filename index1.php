@@ -131,7 +131,7 @@ if (isset($_SESSION[$cache_key]) && (time() - $_SESSION[$cache_key]['timestamp']
                         <button class="more-btn" aria-label="More options for Mike Mueni">...</button>
                     </div>
                     <div>
-                        <p>Trending in sports</p>
+                        <p>Because you reacted to Liverpool tittle winning.</p>
                         <p class="trend-title">Man United Thrashes Leeds United</p>
                         <p>Home derby win for the reds as they eye Premier League title</p>
                         <button class="more-btn" aria-label="More options for Leeds">...</button>

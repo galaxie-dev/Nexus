@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Behavioral tracking for clicks
-    document.querySelectorAll('.tweet').forEach(tweet => {
-        tweet.addEventListener('click', (e) => {
+    document.querySelectorAll('.feed').forEach(feed => {
+        feed.addEventListener('click', (e) => {
             if (e.target.closest('.like-btn, .comment-btn, .share-btn, .comment-form')) return;
-            const newsId = tweet.dataset.newsId;
+            const newsId = feed.dataset.newsId;
             fetch('track.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -28,15 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Future: Send scrollSpeed to server
     });
 
-    document.querySelectorAll('.tweet').forEach(tweet => {
+    document.querySelectorAll('.feed').forEach(feed => {
         let dwellStart = null;
-        tweet.addEventListener('mouseenter', () => {
+        feed.addEventListener('mouseenter', () => {
             dwellStart = Date.now();
         });
-        tweet.addEventListener('mouseleave', () => {
+        feed.addEventListener('mouseleave', () => {
             if (dwellStart) {
                 const dwellTime = Date.now() - dwellStart;
-                console.log('Dwell time on news', tweet.dataset.newsId, ':', dwellTime, 'ms');
+                console.log('Dwell time on news', feed.dataset.newsId, ':', dwellTime, 'ms');
                 // Future: Send dwellTime to server
             }
         });
@@ -131,14 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             const newsId = button.dataset.newsId;
             const platform = button.dataset.platform;
-            const title = document.querySelector(`.tweet[data-news-id="${newsId}"] .tweet-title`).textContent;
+            const title = document.querySelector(`.feed[data-news-id="${newsId}"] .feed-title`).textContent;
             const url = window.location.origin + '/index_after.php';
 
             let shareUrl = '';
             if (platform === 'whatsapp') {
                 shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + ' ' + url)}`;
             } else if (platform === 'twitter') {
-                shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+                shareUrl = `https://twitter.com/intent/feed?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
             }
 
             fetch('share.php', {
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let startTime = Date.now();
 document.addEventListener('scroll', () => {
     const scrollDepth = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
-    const newsId = document.querySelector('.tweet')?.dataset.newsId;
+    const newsId = document.querySelector('.feed')?.dataset.newsId;
     if (newsId) {
         fetch('/track.php', {
             method: 'POST',
@@ -213,7 +213,7 @@ document.addEventListener('scroll', () => {
     }
 });
 window.addEventListener('beforeunload', () => {
-    const newsId = document.querySelector('.tweet')?.dataset.newsId;
+    const newsId = document.querySelector('.feed')?.dataset.newsId;
     if (newsId) {
         navigator.sendBeacon('/track.php', JSON.stringify({
             user_id: <?php echo $_SESSION['user_id'] ?? 0; ?>,
