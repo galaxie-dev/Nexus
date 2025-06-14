@@ -238,6 +238,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         .tweet footer div:hover {
             color: #1da1f2;
         }
+
+
+
+
+
+
+        /* like animation */
+            .notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #1da1f2;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    
+    .notification.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    
+    .notification i {
+        margin-right: 8px;
+    }
+    
+    @keyframes firework {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+    
+    .firework {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: #ff0;
+        animation: firework 0.5s ease-out forwards;
+    }
     </style>
 </head>
 <body>
@@ -267,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     />
                 <?php endif; ?>                           
                 <div class="tweet-header">
-                    <span class="time">@nexus · <?php echo date('M j, Y', strtotime($article['created_at'])); ?></span>
+                    <span class="time">@nexus · <?php echo date('M j, Y g:i a', strtotime($article['created_at'])); ?></span>
                 </div>
                 <h2><?php echo htmlspecialchars($article['title']); ?></h2>
                 <div class="article-content"><?php echo nl2br(htmlspecialchars($article['content'])); ?></div>
@@ -319,6 +365,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
         <?php include 'right-side-bar.php'; ?>
     </div>
+
+
+
+    <div id="notification" class="notification" style="display: none;">
+    <i class="fas fa-check"></i>
+    <span id="notification-text"></span>
+</div>
     
     <?php include 'mobile-menu.php'; ?>
     
@@ -389,6 +442,136 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
             });
         });
+
+
+
+
+
+
+        // notification anime
+        function showNotification(message) {
+        const notification = document.getElementById('notification');
+        const text = document.getElementById('notification-text');
+        
+        text.textContent = message;
+        notification.style.display = 'flex';
+        
+        // Trigger reflow
+        void notification.offsetWidth;
+        
+        notification.classList.add('show');
+        
+        // Create fireworks
+        for (let i = 0; i < 10; i++) {
+            createFirework(notification);
+        }
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }, 2000);
+    }
+    
+    function createFirework(container) {
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        
+        // Random position around the notification
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 20 + Math.random() * 30;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+        
+        firework.style.left = `calc(50% + ${x}px)`;
+        firework.style.top = `calc(50% + ${y}px)`;
+        firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        
+        container.appendChild(firework);
+        
+        // Remove after animation
+        setTimeout(() => {
+            firework.remove();
+        }, 500);
+    }
+    
+    function toggleLike(newsId, isLiked, element, event) {
+        event.stopPropagation();
+        const action = isLiked ? 'unlike' : 'like';
+        
+        fetch('view-article.php?id=' + newsId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=${action}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update heart icon
+                const heartIcon = element.querySelector('i');
+                if (data.is_liked) {
+                    heartIcon.classList.remove('far');
+                    heartIcon.classList.add('fas', 'liked');
+                    showNotification('You liked this article');
+                } else {
+                    heartIcon.classList.remove('fas', 'liked');
+                    heartIcon.classList.add('far');
+                    showNotification('You unliked this article');
+                }
+                
+                // Update like count
+                const likeCount = element.querySelector('.like-count');
+                if (likeCount) {
+                    likeCount.textContent = data.likes;
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    function toggleBookmark(newsId, isBookmarked, element, event) {
+        event.stopPropagation();
+        const action = isBookmarked ? 'unbookmark' : 'bookmark';
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `news_id=${newsId}&action=${action}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                element.classList.toggle('bookmarked');
+                showNotification(isBookmarked ? 'Removed from bookmarks' : 'Article bookmarked');
+            }
+        });
+    }
+
+
+        // Update the toggleBookmark function in view-article.php to show notifications
+    function toggleBookmark(newsId, isBookmarked, element) {
+        const action = isBookmarked ? 'unbookmark' : 'bookmark';
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `news_id=${newsId}&action=${action}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                element.classList.toggle('bookmarked');
+                showNotification(isBookmarked ? 'Removed from bookmarks' : 'Article bookmarked');
+            }
+        });
+    }
     </script>
     <script src="main.js"></script>
 </body>
