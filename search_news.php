@@ -1,5 +1,5 @@
-
 <?php
+// search_news.php
 header('Content-Type: application/json');
 require_once 'includes/db.php';
 
@@ -10,12 +10,16 @@ if (empty($query)) {
     exit;
 }
 
-// Prepare the search query (using LIKE for simple search)
+// Prepare the search query with better ranking
 $searchQuery = "%$query%";
-$stmt = $conn->prepare("SELECT id, title, content, category, likes FROM news_card 
-                        WHERE title LIKE ? OR content LIKE ? 
-                        ORDER BY created_at DESC");
-$stmt->bind_param("ss", $searchQuery, $searchQuery);
+$stmt = $conn->prepare("SELECT id, title, content, category, likes, 
+                       (LENGTH(title) - LENGTH(REPLACE(LOWER(title), LOWER(?), '')) * 10 +
+                       (LENGTH(content) - LENGTH(REPLACE(LOWER(content), LOWER(?), '')) as relevance
+                       FROM news_card 
+                       WHERE title LIKE ? OR content LIKE ? 
+                       ORDER BY relevance DESC, likes DESC
+                       LIMIT 10");
+$stmt->bind_param("ssss", $query, $query, $searchQuery, $searchQuery);
 $stmt->execute();
 $result = $stmt->get_result();
 

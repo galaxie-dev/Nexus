@@ -154,8 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'])) {
 
 
                 <?php foreach ($news_items as $news): ?>
-                <!-- <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>" 
-                onclick="window.location.href='view-article.php?id=<?php echo $news['id']; ?>'"> -->
+    
 
                 <article class="tweet" data-id="<?php echo $news['id']; ?>" aria-label="News item: 
                 <?php echo htmlspecialchars($news['title']); ?>">

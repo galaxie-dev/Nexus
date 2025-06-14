@@ -1,4 +1,50 @@
+<?php
+require_once 'includes/db.php';
 
+// Handle AJAX requests
+if (isset($_GET['action'])) {
+    header('Content-Type: application/json');
+    
+    if ($_GET['action'] == 'get_suggested_news') {
+        // Get suggested news (most liked + commented)
+        $query = "SELECT n.id, n.title, n.content, n.category, n.likes, 
+                 COUNT(c.id) as comments_count
+                 FROM news_card n
+                 LEFT JOIN comments c ON n.id = c.news_id
+                 GROUP BY n.id
+                 ORDER BY (n.likes + COUNT(c.id)) DESC, n.created_at DESC
+                 LIMIT 3";
+        $result = $conn->query($query);
+        
+        $news = [];
+        while ($row = $result->fetch_assoc()) {
+            $news[] = $row;
+        }
+        echo json_encode($news);
+        exit;
+    }
+    elseif ($_GET['action'] == 'search_news' && isset($_GET['query'])) {
+        $query = $_GET['query'];
+        $searchQuery = "%$query%";
+        
+        $stmt = $conn->prepare("SELECT id, title, content, category, likes 
+                               FROM news_card 
+                               WHERE title LIKE ? OR content LIKE ? 
+                               ORDER BY created_at DESC");
+        $stmt->bind_param("ss", $searchQuery, $searchQuery);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $news = [];
+        while ($row = $result->fetch_assoc()) {
+            $news[] = $row;
+        }
+        echo json_encode($news);
+        $stmt->close();
+        exit;
+    }
+}
+?>
 
 <style>
 /* Premium Right Sidebar */
@@ -15,12 +61,41 @@ aside {
   height: 100vh;
   overflow-y: auto;
   z-index: 900;
-  transition: var(--transition);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: translateX(100%);
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,0);
+}
+
+aside.active {
+  transform: translateX(0);
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5);
 }
 
 body.dark-mode aside {
   background: var(--glass-dark);
   border-left: 1px solid var(--dark-border);
+}
+
+/* Close button */
+.close-sidebar {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 901;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.close-sidebar i {
+  font-size: 1.2rem;
 }
 
 .search-box {
@@ -150,58 +225,65 @@ body.dark-mode .trend-title {
   color: var(--primary);
 }
 
-/* Floating "back to top" button */
-.back-to-top {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 48px;
-  height: 48px;
-  background: var(--primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(58, 134, 255, 0.3);
-  opacity: 0;
-  visibility: hidden;
-  transition: var(--transition);
-  z-index: 1000;
-}
-
-.back-to-top.visible {
-  opacity: 1;
-  visibility: visible;
-}
-
-.back-to-top:hover {
-  transform: translateY(-4px);
-}
-
-/* Responsive */
-@media (max-width: 1280px) {
-  aside {
-    transform: translateX(100%);
-    box-shadow: 0 0 0 100vmax rgba(0,0,0,0);
-  }
-  
-  aside.active {
-    transform: translateX(0);
-    box-shadow: 0 0 0 100vmax rgba(0,0,0,0.3);
-  }
-}
-
+/* Mobile styles */
 @media (max-width: 768px) {
   aside {
-    width: 280px;
+    width: 100%;
+    padding: 1rem;
+    border-left: none;
+  }
+  
+  .close-sidebar {
+    display: flex;
+  }
+  
+  .search-box {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .trending-list {
+    gap: 1rem;
+  }
+  
+  .trending-item p {
+    font-size: 0.8rem;
+  }
+  
+  .trend-title {
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1281px) {
+  aside {
+    transform: translateX(0);
+    box-shadow: none;
+  }
+  
+  .close-sidebar {
+    display: none !important;
   }
 }
 </style>
 
 <!-- Premium Right Sidebar -->
 <aside aria-label="Right Sidebar">
+  <div class="close-sidebar" id="close-sidebar">
+    <i class="fas fa-times"></i>
+  </div>
+  
   <div class="search-box" role="search">
     <input type="search" id="news-search" placeholder="Search Nexus..." aria-label="Search" />
     <button id="search-button" aria-label="Search button">
@@ -231,18 +313,53 @@ body.dark-mode .trend-title {
 </aside>
 
 <script>
+// Global function to open sidebar
+window.openSearchSidebar = function() {
+  const sidebar = document.querySelector('aside');
+  if (sidebar) {
+    sidebar.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+  // Toggle sidebar
+  const closeSidebarBtn = document.getElementById('close-sidebar');
+  const sidebar = document.querySelector('aside');
+  
+  // Function to close sidebar
+  function closeSidebar() {
+    sidebar.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  // Close button event
+  if (closeSidebarBtn) {
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+  }
+  
+  // Close when clicking outside
+  sidebar.addEventListener('click', function(e) {
+    if (e.target === sidebar) {
+      closeSidebar();
+    }
+  });
+  
   // Load suggested news on page load
   loadSuggestedNews();
   
   // Search functionality
   const searchInput = document.getElementById('news-search');
   const searchButton = document.getElementById('search-button');
+  const searchResultsSection = document.getElementById('search-results');
   
   searchButton.addEventListener('click', function() {
     const query = searchInput.value.trim();
     if (query) {
       searchNews(query);
+    } else {
+      loadSuggestedNews();
+      searchResultsSection.style.display = 'none';
     }
   });
   
@@ -251,23 +368,31 @@ document.addEventListener('DOMContentLoaded', function() {
       const query = searchInput.value.trim();
       if (query) {
         searchNews(query);
+      } else {
+        loadSuggestedNews();
+        searchResultsSection.style.display = 'none';
       }
     }
   });
 });
 
 function loadSuggestedNews() {
-  fetch('get_suggested_news.php')
+  fetch('right-side-bar.php?action=get_suggested_news')
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById('suggested-news');
       container.innerHTML = '';
       
+      if (data.length === 0) {
+        container.innerHTML = '<p>No suggested news available.</p>';
+        return;
+      }
+      
       data.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.className = 'trending-item';
         newsItem.innerHTML = `
-          <p>${news.category} • ${news.likes} likes</p>
+          <p>${news.category} • ${news.likes} likes • ${news.comments_count || 0} comments</p>
           <p class="trend-title">${news.title}</p>
           <p>${news.content.substring(0, 100)}...</p>
         `;
@@ -277,17 +402,22 @@ function loadSuggestedNews() {
         container.appendChild(newsItem);
       });
     })
-    .catch(error => console.error('Error loading suggested news:', error));
+    .catch(error => {
+      console.error('Error loading suggested news:', error);
+      document.getElementById('suggested-news').innerHTML = '<p>Error loading news. Please try again.</p>';
+    });
 }
 
 function searchNews(query) {
-  fetch(`search_news.php?query=${encodeURIComponent(query)}`)
+  fetch(`right-side-bar.php?action=search_news&query=${encodeURIComponent(query)}`)
     .then(response => response.json())
     .then(data => {
+      const container = document.getElementById('suggested-news');
       const resultsContainer = document.getElementById('search-results-container');
       const searchResultsSection = document.getElementById('search-results');
-      const suggestedNews = document.getElementById('suggested-news');
       
+      container.style.display = 'none';
+      searchResultsSection.style.display = 'block';
       resultsContainer.innerHTML = '';
       
       if (data.length === 0) {
@@ -307,11 +437,11 @@ function searchNews(query) {
           resultsContainer.appendChild(newsItem);
         });
       }
-      
-      // Show search results and hide suggested news
-      searchResultsSection.style.display = 'block';
-      suggestedNews.style.display = 'none';
     })
-    .catch(error => console.error('Error searching news:', error));
+    .catch(error => {
+      console.error('Error searching news:', error);
+      const resultsContainer = document.getElementById('search-results-container');
+      resultsContainer.innerHTML = '<p>Error searching news. Please try again.</p>';
+    });
 }
 </script>

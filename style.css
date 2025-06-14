@@ -143,6 +143,38 @@ main {
     margin-bottom: 1rem;
 }
 
+
+
+.category,
+.name,
+h3,
+.tweet-text {
+  transition: transform 0.2s ease;
+}
+
+
+.category:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.name:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+h3:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.tweet-text:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+
+
 .tweet footer {
     display: flex;
     justify-content: space-between;

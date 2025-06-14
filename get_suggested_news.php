@@ -1,13 +1,17 @@
 <?php
+// get_suggested_news.php
 header('Content-Type: application/json');
 require_once 'includes/db.php';
 
-// In a real application, you would use the logged-in user's ID to personalize suggestions
-// $user_id = $_SESSION['user_id'] ?? 0;
+// Get trending news based on likes + comments
+$query = "SELECT n.id, n.title, n.content, n.category, n.likes, 
+          COUNT(c.id) as comments_count
+          FROM news_card n
+          LEFT JOIN comments c ON n.id = c.news_id
+          GROUP BY n.id
+          ORDER BY (n.likes + COUNT(c.id)) DESC, n.created_at DESC
+          LIMIT 3";
 
-// For now, we'll just get trending news (most liked)
-$query = "SELECT id, title, content, category, likes FROM news_card 
-          ORDER BY likes DESC, created_at DESC LIMIT 3";
 $result = $conn->query($query);
 
 $news = [];

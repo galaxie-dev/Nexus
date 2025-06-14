@@ -85,11 +85,11 @@ $isLoggedIn = isset($_SESSION['user_id']); // You can change this to your actual
 
 </style>
 <div class="mobile-menu">
-        <!-- Home is always visible -->
-        <a href="<?= $current === 'index.php' ? 'index.php' : 'index1.php' ?>" class="mobile-menu-item <?= in_array($current, ['index.php', 'index1.php']) ? 'active' : '' ?>">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
+    <!-- Home is always visible -->
+    <a href="<?= $current === 'index.php' ? 'index.php' : 'index1.php' ?>" class="mobile-menu-item <?= in_array($current, ['index.php', 'index1.php']) ? 'active' : '' ?>">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+    </a>
 
     <?php if ($current === 'index.php'): ?>
         <!-- Show Login only on index.php -->
@@ -98,6 +98,12 @@ $isLoggedIn = isset($_SESSION['user_id']); // You can change this to your actual
             <span>Login</span>
         </a>
     <?php else: ?>
+        <!-- search is always visible -->
+        <a href="right-side-bar.php" class="mobile-menu-item" id="mobile-search-btn">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </a>
+
         <!-- Show Bookmarks -->
         <a href="<?= $isLoggedIn ? 'bookmarks.php' : 'login.php' ?>" class="mobile-menu-item <?= $current === 'bookmarks.php' ? 'active' : '' ?>">
             <i class="fas fa-bookmark"></i>
@@ -117,3 +123,13 @@ $isLoggedIn = isset($_SESSION['user_id']); // You can change this to your actual
         </a>
     <?php endif; ?>
 </div>
+
+<script>
+document.getElementById('mobile-search-btn')?.addEventListener('click', function() {
+    const sidebar = document.querySelector('aside');
+    if (sidebar) {
+        sidebar.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+});
+</script>
