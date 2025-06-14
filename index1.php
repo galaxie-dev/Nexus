@@ -23,7 +23,6 @@ if (isset($_SESSION[$cache_key])) {
 if (!isset($_SESSION[$cache_key])) {
     try {
         // Fetch news items with bookmark status for current user
-        // In index1.php, update the SQL query to:
             $stmt = $pdo->prepare("
                 SELECT n.id, n.title, n.content, n.category, n.image_path, n.likes, n.created_at,
                     (SELECT COUNT(*) FROM bookmarks b WHERE b.news_id = n.id AND b.user_id = ?) as is_bookmarked,

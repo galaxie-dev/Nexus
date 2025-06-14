@@ -17,7 +17,7 @@ try {
     
     // Format join date
     if ($user) {
-        $join_date = date('F Y', strtotime($user['created_at']));
+        $join_date = date('F j Y', strtotime($user['created_at']));
         $initials = strtoupper(substr($user['username'], 0, 1));
     }
 } catch (PDOException $e) {
@@ -40,10 +40,15 @@ try {
 $content = '';
 $error = '';
 
+
+
 switch ($active_tab) {
     case 'liked':
         try {
-            $stmt = $pdo->prepare("SELECT n.id, n.title, n.content, n.category, n.image_path, n.likes, n.created_at
+            $stmt = $pdo->prepare("SELECT n.id, n.title, n.content, n.category, n.image_path, n.likes, n.created_at,
+                                  (SELECT COUNT(*) FROM comments WHERE news_id = n.id) as comment_count,
+                                  (SELECT COUNT(*) FROM bookmarks b WHERE b.news_id = n.id AND b.user_id = :user_id) as is_bookmarked,
+                                  (SELECT COUNT(*) FROM likes l WHERE l.news_id = n.id AND l.user_id = :user_id) as is_liked
                                   FROM likes l
                                   JOIN news_card n ON l.news_id = n.id
                                   WHERE l.user_id = :user_id
@@ -58,11 +63,10 @@ switch ($active_tab) {
                     <p>Articles you like will appear here</p>
                 </div>';
             } else {
-                $content = '<div class="content-grid">';
+                $content = '';
                 foreach ($items as $item) {
-                    $content .= renderNewsCard($item);
+                    $content .= renderArticleCard($item);
                 }
-                $content .= '</div>';
             }
         } catch (PDOException $e) {
             $error = "Failed to load liked posts.";
@@ -71,7 +75,10 @@ switch ($active_tab) {
         
     case 'bookmarks':
         try {
-            $stmt = $pdo->prepare("SELECT n.id, n.title, n.content, n.category, n.image_path, n.likes, n.created_at
+            $stmt = $pdo->prepare("SELECT n.id, n.title, n.content, n.category, n.image_path, n.likes, n.created_at,
+                                  (SELECT COUNT(*) FROM comments WHERE news_id = n.id) as comment_count,
+                                  (SELECT COUNT(*) FROM bookmarks b WHERE b.news_id = n.id AND b.user_id = :user_id) as is_bookmarked,
+                                  (SELECT COUNT(*) FROM likes l WHERE l.news_id = n.id AND l.user_id = :user_id) as is_liked
                                   FROM bookmarks b
                                   JOIN news_card n ON b.news_id = n.id
                                   WHERE b.user_id = :user_id
@@ -86,11 +93,10 @@ switch ($active_tab) {
                     <p>Save articles to read later</p>
                 </div>';
             } else {
-                $content = '<div class="content-grid">';
+                $content = '';
                 foreach ($items as $item) {
-                    $content .= renderNewsCard($item);
+                    $content .= renderArticleCard($item);
                 }
-                $content .= '</div>';
             }
         } catch (PDOException $e) {
             $error = "Failed to load bookmarks.";
@@ -99,7 +105,11 @@ switch ($active_tab) {
         
     case 'comments':
         try {
-            $stmt = $pdo->prepare("SELECT c.id, c.content, c.created_at, n.id as news_id, n.title
+            $stmt = $pdo->prepare("SELECT c.id, c.content, c.created_at, 
+                                  n.id as news_id, n.title, n.category, n.image_path, n.likes, n.created_at as news_created_at,
+                                  (SELECT COUNT(*) FROM comments WHERE news_id = n.id) as comment_count,
+                                  (SELECT COUNT(*) FROM bookmarks b WHERE b.news_id = n.id AND b.user_id = :user_id) as is_bookmarked,
+                                  (SELECT COUNT(*) FROM likes l WHERE l.news_id = n.id AND l.user_id = :user_id) as is_liked
                                   FROM comments c
                                   JOIN news_card n ON c.news_id = n.id
                                   WHERE c.user_id = :user_id
@@ -114,17 +124,21 @@ switch ($active_tab) {
                     <p>Your comments will appear here</p>
                 </div>';
             } else {
-                $content = '<div class="comments-list">';
+                $content = '';
                 foreach ($comments as $comment) {
-                    $content .= '<div class="comment-card">
-                        <div class="comment-header">
-                            <a href="view-article.php?id='.$comment['news_id'].'" class="comment-article">'.$comment['title'].'</a>
-                            <span class="comment-date">'.date('M j, Y g:i a', strtotime($comment['created_at'])).'</span>
-                        </div>
-                        <div class="comment-content">'.htmlspecialchars($comment['content']).'</div>
-                    </div>';
+                    $content .= renderArticleCard([
+                        'id' => $comment['news_id'],
+                        'title' => $comment['title'],
+                        'content' => $comment['content'],
+                        'category' => $comment['category'],
+                        'image_path' => $comment['image_path'],
+                        'likes' => $comment['likes'],
+                        'created_at' => $comment['news_created_at'],
+                        'comment_count' => $comment['comment_count'],
+                        'is_bookmarked' => $comment['is_bookmarked'],
+                        'is_liked' => $comment['is_liked']
+                    ]);
                 }
-                $content .= '</div>';
             }
         } catch (PDOException $e) {
             $error = "Failed to load comments.";
@@ -141,22 +155,45 @@ switch ($active_tab) {
         break;
 }
 
-function renderNewsCard($item) {
-    return '<a href="view-article.php?id='.$item['id'].'" class="news-card">
-        '.($item['image_path'] ? 
-            '<img src="'.htmlspecialchars($item['image_path']).'" alt="'.htmlspecialchars($item['title']).'" class="news-image">' : 
-            '<div class="news-image placeholder"><i class="far fa-newspaper"></i></div>').'
-        <div class="news-content">
-            <span class="news-category">'.htmlspecialchars(ucfirst($item['category'])).'</span>
-            <h3 class="news-title">'.htmlspecialchars($item['title']).'</h3>
-            <p class="news-excerpt">'.htmlspecialchars(substr($item['content'], 0, 120)).'...</p>
-            <div class="news-meta">
-                <span class="news-date">'.date('M j, Y', strtotime($item['created_at'])).'</span>
-                <span class="news-likes"><i class="fas fa-heart"></i> '.$item['likes'].'</span>
+function renderArticleCard($item) {
+    return '<article class="tweet" data-id="'.$item['id'].'" aria-label="News item: '.htmlspecialchars($item['title']).'">
+        <div class="tweet-header">
+            <div>
+                <span class="name">Nexus News™</span>
+                <span class="category">'.htmlspecialchars(ucfirst($item['category'])).'</span>                              
             </div>
         </div>
-    </a>';
+        '.($item['image_path'] ? 
+            '<img src="'.htmlspecialchars($item['image_path']).'" 
+                 alt="Image for news: '.htmlspecialchars($item['title']).'"
+                 class="tweet-image"
+                 loading="lazy" />' : '').'
+        <div class="tweet-header">
+            <span class="time">@nexus · '.date('M j, Y g:i a', strtotime($item['created_at'])).'</span>
+        </div>
+        <h3>'.htmlspecialchars($item['title']).'</h3>
+        <div class="tweet-text">'.htmlspecialchars(substr($item['content'], 0, 250)).'
+            <span class="category">...read article</span>
+        </div>
+        <footer>
+            <div class="comment-button" onclick="window.location.href=\'view-article.php?id='.$item['id'].'\'">
+                <i class="far fa-comment"></i> '.$item['comment_count'].'
+            </div>
+            <div class="like-button" onclick="toggleLike('.$item['id'].', '.($item['is_liked'] ? 'true' : 'false').', this, event)">
+                <i class="'.($item['is_liked'] ? 'fas liked' : 'far').' fa-heart"></i> 
+                <span class="like-count">'.$item['likes'].'</span>
+            </div>
+            <div class="bookmark-button '.($item['is_bookmarked'] ? 'bookmarked' : '').'"
+                onclick="toggleBookmark('.$item['id'].', '.($item['is_bookmarked'] ? 'true' : 'false').', this, event)">
+                <i class="fas fa-bookmark"></i>
+            </div>
+            <div class="share-button" onclick="shareArticle('.$item['id'].', event)">
+                <i class="fas fa-share"></i>
+            </div>
+        </footer>
+    </article>';
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -220,23 +257,16 @@ function renderNewsCard($item) {
 
 
               flex: 1;
-    max-width: 700px;
-    margin: 0 auto; /* This centers the content */
-    padding: 2rem;
-    width: 100%; /* Add this to ensure consistent width */
+            max-width: 700px;
+            margin: 0 auto; /* This centers the content */
+            padding: 2rem;
+            width: 100%; /* Add this to ensure consistent width */
         }
 
         .profile-header {
             padding: 1.5rem;
             position: relative;
         }
-
-        .profile-cover {
-            height: 150px;
-            background: linear-gradient(135deg, var(--primary), #2667cc);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-        }
-
         .profile-avatar {
             width: 100px;
             height: 100px;
@@ -505,9 +535,7 @@ function renderNewsCard($item) {
                 grid-template-columns: 1fr;
             }
             
-            .profile-cover {
-                height: 120px;
-            }
+           
             
             .profile-avatar {
                 width: 80px;
@@ -562,7 +590,7 @@ function renderNewsCard($item) {
         <?php include 'navigation.php'; ?>
         
         <main>
-            <div class="profile-cover"></div>
+            
             
             <div class="profile-header">
                 <div class="profile-avatar">
