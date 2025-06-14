@@ -18,6 +18,46 @@ try {
     $error = "Failed to load bookmarks.";
     file_put_contents(__DIR__ . '/logs/nexus.log', date('Y-m-d H:i:s') . " - Bookmarks fetch failed: " . $e->getMessage() . "\n", FILE_APPEND);
 }
+
+
+
+
+// Handle bookmark actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['news_id'])) {
+    $news_id = $_POST['news_id'];
+    $action = $_POST['action'];
+    
+    try {
+        if ($action === 'bookmark') {
+            // Check if already bookmarked
+            $check = $pdo->prepare("SELECT id FROM bookmarks WHERE user_id = ? AND news_id = ?");
+            $check->execute([$user_id, $news_id]);
+            
+            if (!$check->fetch()) {
+                $stmt = $pdo->prepare("INSERT INTO bookmarks (user_id, news_id) VALUES (?, ?)");
+                $stmt->execute([$user_id, $news_id]);
+            }
+        } elseif ($action === 'unbookmark') {
+            $stmt = $pdo->prepare("DELETE FROM bookmarks WHERE user_id = ? AND news_id = ?");
+            $stmt->execute([$user_id, $news_id]);
+        }
+        
+        // Update the cached data
+        foreach ($news_items as &$item) {
+            if ($item['id'] == $news_id) {
+                $item['is_bookmarked'] = ($action === 'bookmark') ? 1 : 0;
+                break;
+            }
+        }
+        $_SESSION[$cache_key]['data'] = $news_items;
+        
+        echo json_encode(['success' => true]);
+        exit;
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        exit;
+    }
+}
 ?>
 
 
@@ -28,68 +68,76 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nexus - Bookmarks</title>
     <link href="style.css" rel="stylesheet">
+     <link href="mobile-style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/onnx@0.0.7/dist/onnx.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
 </head>
 <body>
     <div class="container" role="main">
-        <!-- Fixed Sidebar -->
-        <nav class="fixed-sidebar" aria-label="Primary Navigation">
-            <button class="close-btn" aria-label="Close menu"><i>NEXUS</i></button>
-            <ul>
-                <li class="home"><a style="text-decoration: none;" href=index1.php><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <!-- <li><i class="fas fa-search" aria-hidden="true"></i> Explore</li>   -->
-                <!-- <li><i class="fas fa-bell" aria-hidden="true"></i> Notifications</li> -->
-                <!-- <li><i class="fas fa-envelope" aria-hidden="true"></i> Messages</li> -->
-                <li><a href="bookmarks.php" style="text-decoration: none;"><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</a></li>
-                <li><i class="fas fa-user" aria-hidden="true"><a href=user-dash.php></i> Profile</li>          
-            
-                <!-- <li><a href="login.php" style="text-decoration: none;"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Login</a></li> -->
-                <!-- <li><a href="signup.php"><i class="fas fa-in" aria-hidden="true"></i> Sign up</a></li> -->
-            
-            </ul>
-        </nav>
+        <?php include 'navigation.php'; ?>
+
         <!-- Main Content -->
-        <section>
-            <h2>Your Bookmarked News</h2>
+        <main>
+            <div class="page-header">NEXUS</div>
+            <h2 class="page-header">Bookmarks</h2>
 
             <?php if (isset($error)): ?>
                 <p class="error"><?php echo htmlspecialchars($error); ?></p>
             <?php elseif (empty($bookmarked_news)): ?>
                 <p>You have not bookmarked any news yet.</p>
             <?php else: ?>
+
+
                 <div id="bookmarked-feed">
                     <?php foreach ($bookmarked_news as $news): ?>
-                        <article class="tweet" data-news-id="<?php echo $news['id']; ?>">
-                            <div class="tweet-header">
-                                <div>
-                                    <span class="name">Nexus News</span>
-                                    <span class="category"><?php echo htmlspecialchars(ucfirst($news['category'])); ?></span>
-                                    <span class="time"><?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>
-                                </div>
+                    <article class="tweet" aria-label="News item: <?php echo htmlspecialchars($news['title']); ?>">
+                    
+                     <div class="tweet-header">
+                            <div>
+                                <span class="name">Nexus News™</span>
+                                <span class="category"><?php echo htmlspecialchars(ucfirst($news['category'])); ?></span>                              
                             </div>
-                            <h3 class="tweet-title"><?php echo htmlspecialchars($news['title']); ?></h3>
-                            <div class="tweet-text"><?php echo htmlspecialchars(substr($news['content'], 0, 200)); ?>...</div>
+                    </div>
+                   
                             <?php if ($news['image_path']): ?>
-                                <img src="<?php echo htmlspecialchars($news['image_path']); ?>" class="tweet-image" alt="News image">
-                            <?php endif; ?>
-                            <div class="tweet-footer">
-                                <div>
-                                    <button class="like-btn" data-news-id="<?php echo $news['id']; ?>">
-                                        <i class="fas fa-heart"></i> <span><?php echo $news['likes']; ?></span>
-                                    </button>
-                                </div>
+                                <img
+                                    src="<?php echo htmlspecialchars($news['image_path']); ?>"
+                                    alt="Image for news: <?php echo htmlspecialchars($news['title']); ?>"
+                                    class="tweet-image"
+                                    loading="lazy"
+                                />
+                            <?php endif; ?>                           
+                            <div class="tweet-header">
+                                <span class="time">@nexus · <?php echo date('M j, Y', strtotime($news['created_at'])); ?></span>
                             </div>
-                        </article>
+                            <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                             <div class="tweet-text"><?php echo htmlspecialchars(substr($news['content'], 0, 250)); ?>
+                             <span class="category">...read article</span></div>
+                            <footer>
+                                <div><i class="far fa-comment"></i> 0</div>
+                                <div><i class="far fa-heart"></i> <?php echo $news['likes']; ?></div>
+                                <div class="<?php echo $news['is_bookmarked'] ? 'bookmarked' : ''; ?>"
+                                     onclick="toggleBookmark(<?php echo $news['id']; ?>, <?php echo $news['is_bookmarked'] ? 'true' : 'false'; ?>, this)">
+                                    <i class="fas fa-bookmark"></i>
+                                </div>
+                                <div><i class="fas fa-share"></i></div>
+                            </footer>
+                        </div>
+                    </article>
                     <?php endforeach; ?>
                 </div>
-            <?php endif; ?>
-        </section>
 
+
+                
+            <?php endif; ?>
+        </main>
+   <?php include 'right-side-bar.php'; ?>
 
 
     </div>
+
+        <?php include 'mobile-menu.php'; ?>
     <script src="assets/js/app.js"></script>
     <script>
         // Register service worker

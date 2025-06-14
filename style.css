@@ -1,488 +1,431 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@400;600&display=swap');
+
 :root {
-    --primary-color: #86A9BC;
-    --secondary-color: #3E3E38;
-    --dark-color: #080809;
-    --text-color: #54595f;
-    --light-bg: #f7f7f7;
-    --white: #ffffff;
-  }
+  --primary: #1da1f2;
+  --bg: #f5f8fa;
+  --text: #14171a;
+  --muted: #657786;
+  --card-bg: #ffffff;
+  --border: #e1e8ed;
+  --hover: rgba(29, 161, 242, 0.1);
+  --dark-bg: #121212;
+  --dark-text: #eaeaea;
+  --dark-card-bg: #1e1e1e;
+  --dark-border: #333;
+  --dark-muted: #aaa;
+  --font: 'Inter', 'Segoe UI', sans-serif;
+  scroll-behavior: smooth;
+}
 
-
-
-  * {
+* {
     box-sizing: border-box;
-  }
-  body {
     margin: 0;
-    background-color: #000;
-    color: white;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  a, button {
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: inherit;
-    font: inherit;
-  }
-  img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
-  /* Scrollbar for main content and right sidebar */
-  main, aside {
-    overflow-y: auto;
-  }
-  /* Container */
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0;
+}
+
+
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.container {
     display: flex;
     min-height: 100vh;
-  }
-  /* Left Sidebar */
-  nav {
-    width: 280px;
-    border-right: 1px solid #222;
-    padding: 1rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-  }
-  nav button.close-btn {
-    color: white;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+body.dark-mode nav,
+body.dark-mode main,
+body.dark-mode aside {
+  background-color: var(--dark-card-bg);
+  border-color: var(--dark-border);
+}
+
+body.dark-mode .tweet {
+  background-color: var(--dark-card-bg);
+  color: var(--dark-text);
+  box-shadow: 0 1px 4px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .tweet footer div {
+  color: var(--dark-muted);
+}
+
+/* Main */
+main {
+    flex: 1;
+    max-width: 700px;
+    margin: 0 auto; /* This centers the content */
+    padding: 2rem;
+    width: 100%; /* Add this to ensure consistent width */
+}
+
+.page-header {
     font-size: 2rem;
-    width: 40px;
-    height: 40px;
-    align-self: flex-start;
-    background: none;
-    border: none;
-    margin-bottom: 1.5rem;
-  }
-  nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-  }
-  nav ul li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1rem;
-    margin-bottom: 1.25rem;
-    font-weight: 400;
-    color: white;
-    user-select: none;
-  }
-  nav ul li.home {
-    font-weight: 600;
-  }
-  nav ul li i {
-    font-size: 1.25rem;
-    min-width: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
     text-align: center;
-  }
-  nav button.post-btn {
-    margin-top: auto;
-    background-color: #f0f4f7;
-    color: black;
-    font-weight: 600;
-    border-radius: 9999px;
-    padding: 0.5rem 3rem;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-  nav button.post-btn:hover {
-    background-color: #d9e2e9;
-  }
-  /* Main Content */
-  main {
-    flex: 1;
-    max-width: 600px;
-    border-right: 1px solid #222;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-  }
-  /* Tabs */
-  .tabs {
-    display: flex;
-    justify-content: center;
-    border-bottom: 1px solid #222;
-    background-color: #000;
-  }
-  .tabs button {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #888;
-    padding: 1rem 2.5rem;
-    border-bottom: 3px solid transparent;
-    background: none;
-    transition: all 0.3s ease;
-  }
-  .tabs button.active {
-    color: white;
-    border-bottom-color: #82A8B;
-  }
-  /* Tweet article */
-  article.tweet {
-    border-bottom: 1px solid #222;
-    padding: 1rem;
-    display: flex;
-    gap: 1rem;
-  }
-  article.tweet img.profile-pic {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.tweet {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%; /* Ensure full width within container */
+    max-width: 100%; /* Prevent overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.tweet.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tweet:hover {
+    transform: scale(1.01);
+}
+
+.tweet-image {
+    width: 100%;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
     object-fit: cover;
-  }
-  article.tweet .content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  article.tweet header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #ccc;
-  }
-  article.tweet header .name {
-    font-weight: 700;
-    color: white;
-  }
-  article.tweet header .verified {
-    color: #1DA1F2;
-    font-size: 0.9rem;
-  }
-  article.tweet header .time {
-    color: #666;
-  }
-  article.tweet header button.more-btn {
-    margin-left: auto;
-    color: #666;
-    font-size: 1rem;
-    background: none;
-    border: none;
-    transition: color 0.2s ease;
-  }
-  article.tweet header button.more-btn:hover {
-    color: white;
-  }
-  article.tweet p.text {
-    margin: 0.5rem 0 0 0;
-    font-size: 0.875rem;
-    line-height: 1.3;
-    white-space: pre-line;
-  }
-  article.tweet img.tweet-image {
-    margin-top: 0.75rem;
-    border-radius: 0.5rem;
     max-height: 300px;
-    object-fit: cover;
-  }
-  article.tweet footer {
-    margin-top: 0.75rem;
-    display: flex;
-    justify-content: space-between;
-    color: #666;
-    font-size: 0.75rem;
-  }
-  article.tweet footer div {
+}
+
+.tweet header {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-  }
-  article.tweet footer div i {
-    font-size: 1rem;
-  }
-  article.tweet footer div:last-child {
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.name {
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+.time {
+    font-size: 0.9rem;
+    color: var(--light-text);
+}
+
+.tweet h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.tweet .text {
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.category {
+    display: inline-block;
+    background: rgba(29, 161, 242, 0.1);
+    color: var(--primary);
+    padding: 0.3rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.tweet footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+.tweet footer div {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--light-text);
     cursor: pointer;
-  }
-  /* Ad label */
-  .ad-label {
-    font-size: 0.75rem;
-    color: #666;
-    margin-left: 0.25rem;
-  }
-  /* Ad emoji */
-  .ad-emoji {
-    font-size: 1.5rem;
-    margin-top: 0.25rem;
-  }
-  /* Overlay text on image for ad */
-  .ad-image-label {
-    position: relative;
-    margin-top: 0.75rem;
-  }
-  .ad-image-label span {
-    position: absolute;
-    bottom: 0.25rem;
-    left: 0.25rem;
-    background-color: rgba(0,0,0,0.7);
-    color: white;
-    font-size: 0.625rem;
-    font-weight: 600;
-    padding: 0.1rem 0.3rem;
-    border-radius: 0.15rem;
-    user-select: none;
-  }
-  .ad-source {
-    font-size: 0.625rem;
-    color: #666;
-    margin-top: 0.15rem;
-  }
-  /* Right Sidebar */
-  aside {
-    width: 320px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    overflow-y: auto;
-  }
-  /* Search box */
-  .search-box {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid #222;
-    border-radius: 1.5rem;
-    padding: 0.25rem 0.75rem;
-    background-color: #000;
-  }
-  .search-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: #ccc;
-    font-size: 0.75rem;
-    outline: none;
-  }
-  .search-box input::placeholder {
-    color: #888;
-  }
-  .search-box button {
-    color: #888;
-    font-size: 1rem;
-  }
-  /* Hosting boxes */
-  .hosting-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .hosting-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #82A8B;
-    border-radius: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    background-color: #000;
-  }
-  .hosting-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .hosting-left img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .hosting-text {
-    font-size: 0.75rem;
-    color: white;
-    font-weight: 600;
-  }
-  .hosting-subtext {
-    font-size: 0.625rem;
-    color: #666;
-  }
-  .hosting-right {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #82A8B;
-    border: 1px solid #82A8B;
-    border-radius: 0.75rem;
-    padding: 0 0.4rem;
-    user-select: none;
-  }
-  /* What’s happening & Who to follow sections */
-  section.card {
-    border: 1px solid #222;
-    border-radius: 1rem;
-    padding: 1rem;
-    background-color: #000;
-  }
-  section.card h2 {
-    font-weight: 700;
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
-  }
-  /* What's happening items */
-  .wh-item {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  .wh-item img {
-    width: 48px;
-    height: 48px;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  .wh-item .wh-text {
-    font-size: 0.75rem;
-    color: white;
-  }
-  .wh-item .wh-text p {
-    margin: 0;
-  }
-  .wh-item .wh-text p.live {
-    font-size: 0.625rem;
-    color: #666;
-    margin-top: 0.15rem;
-  }
-  /* Trending list */
-  .trending-list {
-    font-size: 0.625rem;
-    color: #666;
-  }
-  .trending-list > div {
-    margin-bottom: 1rem;
-  }
-  .trending-list p {
-    margin: 0;
-  }
-  .trending-list .trend-title {
-    font-weight: 700;
-    color: white;
-    margin: 0.15rem 0 0.15rem 0;
-  }
-  .trending-list button.more-btn {
-    background: none;
-    border: none;
-    color: #82A8B;
-    font-size: 0.75rem;
-    cursor: pointer;
-    padding: 0;
-  }
-  /* Who to follow items */
-  .follow-list article {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .follow-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .follow-left img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  .follow-left .user-info {
-    font-size: 0.75rem;
-    color: white;
-  }
-  .follow-left .user-info p {
-    margin: 0;
-  }
-  .follow-left .user-info .handle {
-    color: #666;
-    font-size: 0.625rem;
-  }
-  .follow-left .verified {
-    color: #1DA1F2;
-    font-size: 0.75rem;
-  }
-  .follow-btn {
-    background-color: white;
-    color: black;
-    border-radius: 9999px;
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 0.25rem 1rem;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-  .follow-btn:hover {
-    background-color: #e6e6e6;
-  }
-  /* Footer */
-  footer.footer {
-    font-size: 0.625rem;
-    color: #666;
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-  footer.footer p {
-    margin: 0;
-  }
-  /* Responsive */
-  @media (max-width: 1200px) {
-    nav {
-      width: 220px;
-      padding: 1rem;
-    }
-    main {
-      max-width: 100%;
-    }
+    transition: color 0.2s;
+}
+
+.tweet footer div:hover {
+    color: var(--primary);
+}
+
+.bookmarked {
+    color: var(--primary) !important;
+    transform: scale(1.2);
+    transition: transform 0.2s;
+}
+
+
+
+
+aside {
+  width: 300px;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-left: 1px solid var(--border);
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.dark-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  z-index: 100;
+  background: var(--primary);
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s;
+}
+
+.dark-toggle-btn:hover {
+  background: #0b8edc;
+}
+
+
+
+
+
+/* Mobile Menu */
+.mobile-menu {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
     aside {
-      display: none;
+        display: none;
     }
+}
+
+
+
+@media (max-width: 768px) {
+  nav, aside {
+    display: none;
   }
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-    }
-    nav {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #222;
-      padding: 0.5rem 1rem;
-      flex-direction: row;
-      align-items: center;
-      overflow-x: auto;
-    }
-    nav ul {
-      display: flex;
-      gap: 1rem;
-      flex-grow: 1;
-      margin: 0;
-      padding: 0;
-      overflow-x: auto;
-    }
-    nav ul li {
-      margin-bottom: 0;
-      white-space: nowrap;
-      font-size: 0.875rem;
-    }
-    nav button.post-btn {
-      margin-top: 0;
-      padding: 0.4rem 1.5rem;
-      font-size: 0.875rem;
-    }
-    main {
-      max-width: 100%;
-      border-right: none;
-    }
+
+  .mobile-menu {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem;
+    z-index: 999;
+    justify-content: space-around;
   }
+
+  .mobile-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .mobile-menu-item i {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  main {
+    padding-bottom: 80px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===BOOKMARKS==== */
+/* Bookmark Page Specific Styles */
+section {
+  flex: 1;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  text-align: center;
+}
+
+#bookmarked-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+#bookmarked-feed .tweet,
+main article.tweet {
+    width: 100%;
+    max-width: 100%;
+}
+.tweet {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.tweet:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tweet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.tweet-header .name {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.tweet-header .category {
+  background: rgba(29, 161, 242, 0.1);
+  color: var(--primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.tweet-header .time {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.tweet-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.tweet-text {
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.tweet-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+.tweet-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.tweet-footer div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.like-btn, .bookmark-btn, .comment-btn, .share-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.like-btn:hover, .bookmark-btn:hover, 
+.comment-btn:hover, .share-btn:hover {
+  color: var(--primary);
+}
+
+.like-btn i, .bookmark-btn i, 
+.comment-btn i, .share-btn i {
+  margin-right: 0.3rem;
+}
+
+.like-btn.liked {
+  color: #e0245e;
+}
+
+.bookmark-btn.bookmarked {
+  color: var(--primary);
+}
+
+/* Dark mode adjustments for bookmarks */
+body.dark-mode .tweet {
+  background: var(--dark-card-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .tweet-title,
+body.dark-mode .tweet-text {
+  color: var(--dark-text);
+}
+
+body.dark-mode .tweet-header .time {
+  color: var(--dark-muted);
+}
+
+/* Error and empty states */
+.error {
+  color: #e0245e;
+  background: rgba(224, 36, 94, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+section > p {
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem;
+}

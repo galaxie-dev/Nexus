@@ -62,15 +62,8 @@ try {
 </head>
 <body>
     <div class="container" role="main">
-        <!-- Fixed Sidebar -->
-        <nav class="fixed-sidebar" aria-label="Primary Navigation">
-            <button class="close-btn" aria-label="Close menu"><i>NEXUS</i></button>
-            <ul>
-                <li class="home"><a style="text-decoration: none;" href="index.php"><i class="fas fa-home" aria-hidden="true"></i> Home</a></li>
-                <li><a href="bookmarks.php" style="text-decoration: none;"><i class="fas fa-bookmark" aria-hidden="true"></i> Bookmarks</a></li>
-                <li><a href="user-dash.php" style="text-decoration: none;"><i class="fas fa-user" aria-hidden="true"></i> Profile</a></li>
-            </ul>
-        </nav>
+        <?php include 'navigation.php'; ?>
+
         <!-- Main Content -->
         <section>
             <h2>Profile</h2>
@@ -91,7 +84,9 @@ try {
        
         </section>
     </div>
-    <script src="assets/js/app.js"></script>
+        <?php include 'mobile-menu.php'; ?>
+           <?php include 'right-side-bar.php'; ?>
+    
     <script>
          
     </script>
